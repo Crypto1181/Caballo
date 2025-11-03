@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'stock_detail_screen.dart';
+import 'menu_drawer_screen.dart';
+import '../widgets/language_toggle.dart';
+import '../utils/translation_helper.dart';
+import '../providers/language_provider.dart';
 
-class ExploreCryptoScreen extends StatelessWidget {
+class ExploreCryptoScreen extends StatefulWidget {
   const ExploreCryptoScreen({super.key});
+
+  @override
+  State<ExploreCryptoScreen> createState() => _ExploreCryptoScreenState();
+}
+
+class _ExploreCryptoScreenState extends State<ExploreCryptoScreen> {
+  String _selectedFilter = 'Trending';
 
   @override
   Widget build(BuildContext context) {
@@ -15,307 +27,213 @@ class ExploreCryptoScreen extends StatelessWidget {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'N/A',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Crypto',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDark ? Colors.grey[400] : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.search, color: isDark ? Colors.white : Colors.black),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.notifications_outlined, color: isDark ? Colors.white : Colors.black),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Body
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
+              padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    const SizedBox(height: 8),
-                    // Promotional Banner
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.purple[50]!, Colors.orange[50]!],
+                  IconButton(
+                    icon: Icon(Icons.menu, color: isDark ? Colors.white : Colors.black),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MenuDrawerScreen(),
+                          fullscreenDialog: true,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[900] : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search',
+                          hintStyle: TextStyle(
+                            color: isDark ? Colors.grey[600] : Colors.grey[400],
+                              fontSize: 16,
                           ),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey[200]!),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: isDark ? Colors.grey[600] : Colors.grey[400],
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'A new home for crypto',
-                                    style: TextStyle(
-                                      color: isDark ? Colors.white : Colors.black,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Trade and transfer crypto 24/7.',
-                                    style: TextStyle(
-                                      color: isDark ? Colors.grey[400] : Colors.grey[700],
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.purple[400]!, Colors.orange[400]!],
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.currency_bitcoin,
-                                size: 40,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    // Bring crypto card
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[900] : Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF00C853),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.account_balance_wallet, color: Colors.white, size: 26),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Bring your crypto into Caballo',
-                                    style: TextStyle(
-                                      color: isDark ? Colors.white : Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Deposit crypto →',
-                                    style: TextStyle(
-                                      color: const Color(0xFF00C853),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Explore crypto section
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Explore crypto',
-                            style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          // Toggle buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: isDark ? Colors.grey[800] : Colors.black,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: const Text(
-                                    'Tradable',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () {},
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Non-tradable',
-                                    style: TextStyle(
-                                      color: isDark ? Colors.grey[400] : Colors.grey[700],
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-            const SizedBox(height: 24),
-            // Crypto list with charts
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  _buildCryptoItem(context, 'HYPE', 'Hyperliquid', 47.18, false),
-                  const SizedBox(height: 12),
-                  _buildCryptoItem(context, 'BTC', 'Bitcoin', 115141.96, true),
-                  const SizedBox(height: 12),
-                  _buildCryptoItem(context, 'ETH', 'Ethereum', 4160.72, true),
-                  const SizedBox(height: 12),
-                  _buildCryptoItem(context, 'SOL', 'Solana', 200.04, false),
+                  ),
+                  const SizedBox(width: 8),
+                  const LanguageToggle(),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(Icons.notifications_outlined, color: isDark ? Colors.white : Colors.black),
+                          onPressed: () {},
+                  ),
                 ],
               ),
             ),
-                    const SizedBox(height: 32),
-                    // Latest in crypto news
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Latest in crypto',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+            
+            // Title
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Text(
+                      context.t('trade'),
+                  style: TextStyle(
+                        fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                  ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            
             const SizedBox(height: 16),
-            // News articles
-            _buildNewsItem(
-              context,
-              'Seeking Alpha',
-              '8m',
-              'Strategy adds 390 bitcoin for \$43.4M in latest weekly purchase',
-              'https://via.placeholder.com/80',
+            
+            // Filter chips
+            Consumer<LanguageProvider>(
+              builder: (context, lang, _) {
+                return SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    children: [
+                      _buildFilterChip(context.t('trending')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip(context.t('top_volume')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip(context.t('top_gainers')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip(context.t('top_losers')),
+                    ],
+                  ),
+                );
+              },
             ),
-            _buildNewsItem(
-              context,
-              'The Block',
-              '11m',
-              'BitMine\'s Ethereum holdings surpass 3.3 million ether after latest 77,055 ETH purchase',
-              null,
-            ),
-            _buildNewsItem(
-              context,
-              'TipRanks',
-              '16m',
-              'Reliance Global adds Solana to digital asset treasury',
-              null,
-            ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Show more',
-                          style: TextStyle(
-                            color: const Color(0xFF00C853),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+            
+            const SizedBox(height: 24),
+            
+            // Crypto list
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                children: [
+                  _buildCryptoItem(
+                    'Virtuals Protocol',
+                    'VIRTUAL',
+                    '56K trades',
+                    '\$962M mcap',
+                    2.25,
+                    true,
+                    Colors.teal,
+                  ),
+                  _buildCryptoItem(
+                    'Zora',
+                    'ZORA',
+                    '29K trades',
+                    '\$358M mcap',
+                    9.95,
+                    false,
+                    Colors.blue,
+                  ),
+                  _buildCryptoItem(
+                    'Aerodrome Finance',
+                    'AERO',
+                    '7K trades',
+                    '\$860M mcap',
+                    0.89,
+                    true,
+                    Colors.lightBlue,
+                  ),
+                  _buildCryptoItem(
+                    'Sapien',
+                    'SAPIEN',
+                    '24K trades',
+                    '\$41M mcap',
+                    23.81,
+                    true,
+                    Colors.blue[900]!,
+                  ),
+                  _buildCryptoItem(
+                    'tokenbot',
+                    'TOKENBOT',
+                    '2.2K trades',
+                    '\$109M mcap',
+                    5.45,
+                    false,
+                    Colors.purple,
+                  ),
+                  _buildCryptoItem(
+                    'GAME by Virtuals',
+                    'GAME',
+                    '8.8K trades',
+                    '\$39M mcap',
+                    16.13,
+                    true,
+                    Colors.cyan,
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Browse all button
+                  OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    // Disclaimer
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        'Cryptocurrencies offered by Caballo Crypto are not securities and your cryptocurrency investments are not FDIC or SIPC insured.',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
+              child: Text(
+                      'Browse all',
+                style: TextStyle(
+                        fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
-                    const SizedBox(height: 40),
-                  ],
+                ),
+                  
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+            
+            // Buy & sell button
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'Buy & sell',
+                style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -325,7 +243,43 @@ class ExploreCryptoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCryptoItem(BuildContext context, String symbol, String name, double price, bool isPositive) {
+  Widget _buildFilterChip(String label) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSelected = _selectedFilter == label;
+    
+    return GestureDetector(
+      onTap: () => setState(() => _selectedFilter = label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+          color: isSelected 
+            ? (isDark ? Colors.grey[800] : Colors.grey[900])
+            : (isDark ? Colors.grey[900] : Colors.grey[100]),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            color: isSelected 
+              ? Colors.white
+              : (isDark ? Colors.grey[400] : Colors.grey[700]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCryptoItem(
+    String name,
+    String symbol,
+    String trades,
+    String mcap,
+    double changePercent,
+    bool isPositive,
+    Color iconColor,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return InkWell(
@@ -336,115 +290,99 @@ class ExploreCryptoScreen extends StatelessWidget {
             builder: (_) => StockDetailScreen(
               symbol: symbol,
               name: name,
-              price: price,
-              change: isPositive ? 12.50 : -8.30,
+              price: 100.0,
+              change: changePercent,
               isPositive: isPositive,
             ),
           ),
         );
       },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.grey[900] : Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
-        ),
-        child: Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Icon
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Center(
+                child: Text(
+                  symbol[0],
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(width: 12),
+            
+            // Name and details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                Text(
+                  name,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$symbol · $trades',
+              style: TextStyle(
+                fontSize: 14,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+            ),
+            
+            // Market cap and change
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  symbol,
+                  mcap,
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Mini chart placeholder
-          const SizedBox(width: 40),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: isPositive ? const Color(0xFF00C853) : Colors.orange[600],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              '\$${price.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNewsItem(BuildContext context, String source, String time, String headline, String? imageUrl) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (imageUrl != null)
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(Icons.image, color: isDark ? Colors.grey[600] : Colors.grey[400]),
-            ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$source • $time',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
-                  ),
-                ),
                 const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      isPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                      size: 14,
+                      color: isPositive ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(width: 4),
                 Text(
-                  headline,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: isDark ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.w500,
+                      '${changePercent.toStringAsFixed(2)}%',
+                      style: TextStyle(
+                    fontSize: 14,
+                        color: isPositive ? Colors.green : Colors.red,
+                      ),
                   ),
+                  ],
                 ),
               ],
             ),
+          ],
           ),
-        ],
       ),
     );
   }
 }
-

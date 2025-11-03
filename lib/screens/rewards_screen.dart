@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
 
 class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
@@ -9,77 +8,345 @@ class RewardsScreen extends StatefulWidget {
 }
 
 class _RewardsScreenState extends State<RewardsScreen> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  bool _isCardVisible = true;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF006844), // Dark green background
+      backgroundColor: isDark ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            // Main Content with PageView
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() => _currentPage = index);
-                },
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildPage1(),
-                  _buildPage2(),
-                  _buildPage3(),
+                  IconButton(
+                    icon: Icon(Icons.menu, color: isDark ? Colors.white : Colors.black),
+                    onPressed: () {},
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.add, color: isDark ? Colors.white : Colors.black),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.more_vert, color: isDark ? Colors.white : Colors.black),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-            // Pagination dots
+            
+            // Title
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _currentPage == index
-                          ? Colors.green.shade300
-                          : Colors.green.shade300.withValues(alpha: 0.3),
-                      shape: BoxShape.circle,
-                    ),
-                  );
-                }),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Credit Card',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
               ),
             ),
-            // Bottom CTA button
+            
+            const SizedBox(height: 24),
+            
+            // Credit card display
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF1E3A8A),
+                      Color(0xFF3B82F6),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    // Card details
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'CABALLO',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  _isCardVisible ? Icons.visibility : Icons.visibility_off,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() => _isCardVisible = !_isCardVisible);
+                                },
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          // Card number
+                          Text(
+                            _isCardVisible ? '4532  ••••  ••••  8790' : '••••  ••••  ••••  ••••',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'CARD HOLDER',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white.withOpacity(0.7),
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'JAMES WILSON',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'EXPIRES',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white.withOpacity(0.7),
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _isCardVisible ? '12/28' : '••/••',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Visa/Mastercard logo
+                              Container(
+                                width: 50,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'VISA',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF1E3A8A),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Card controls
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildCardControl(
+                      Icons.lock_outline,
+                      'Lock Card',
+                      isDark,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildCardControl(
+                      Icons.settings_outlined,
+                      'Settings',
+                      isDark,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildCardControl(
+                      Icons.credit_card_outlined,
+                      'Details',
+                      isDark,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Recent transactions
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Recent Transactions',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'See all',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Transaction list
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                children: [
+                  _buildTransactionItem(
+                    'Amazon',
+                    'Online Shopping',
+                    'Today, 2:45 PM',
+                    '-\$127.99',
+                    Icons.shopping_bag_outlined,
+                    Colors.orange,
+                    isDark,
+                  ),
+                  _buildTransactionItem(
+                    'Starbucks',
+                    'Food & Dining',
+                    'Today, 9:30 AM',
+                    '-\$6.75',
+                    Icons.coffee_outlined,
+                    Colors.green,
+                    isDark,
+                  ),
+                  _buildTransactionItem(
+                    'Shell Gas',
+                    'Transportation',
+                    'Yesterday',
+                    '-\$52.00',
+                    Icons.local_gas_station_outlined,
+                    Colors.red,
+                    isDark,
+                  ),
+                  _buildTransactionItem(
+                    'Netflix',
+                    'Entertainment',
+                    'Jan 28',
+                    '-\$15.99',
+                    Icons.play_circle_outline,
+                    Colors.red[900]!,
+                    isDark,
+                  ),
+                  _buildTransactionItem(
+                    'Whole Foods',
+                    'Groceries',
+                    'Jan 27',
+                    '-\$89.43',
+                    Icons.shopping_cart_outlined,
+                    Colors.green[700]!,
+                    isDark,
+                  ),
+                ],
+              ),
+            ),
+            
+            // Apply for card button
+            Padding(
+              padding: const EdgeInsets.all(24),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGreen,
+                    backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: const Text(
-                    'Get started',
+                    'Apply for Card',
                     style: TextStyle(
-                      color: Colors.white,
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -91,283 +358,90 @@ class _RewardsScreenState extends State<RewardsScreen> {
     );
   }
 
-  // Page 1: IRA Growth Chart
-  Widget _buildPage1() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            Text(
-              '*Hypothetical illustration',
-              style: TextStyle(
-                color: Colors.green.shade300,
-                fontSize: 12,
-              ),
+  Widget _buildCardControl(IconData icon, String label, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: isDark ? Colors.white : Colors.black,
+            size: 24,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white : Colors.black,
             ),
-            const SizedBox(height: 20),
-            // Legend
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionItem(
+    String title,
+    String category,
+    String date,
+    String amount,
+    IconData icon,
+    Color iconColor,
+    bool isDark,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade300,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
                 Text(
-                  'GROWTH POTENTIAL',
+                  title,
                   style: TextStyle(
-                    color: Colors.green.shade300,
-                    fontSize: 11,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF00A843),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
+                const SizedBox(height: 4),
                 Text(
-                  'IRA CONTRIBUTIONS',
+                  '$category • $date',
                   style: TextStyle(
-                    color: Colors.green.shade300,
-                    fontSize: 11,
+                    fontSize: 14,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 40),
-            // Growth chart illustration
-            _buildGrowthChart(),
-            const SizedBox(height: 60),
-            // Call to action
-            Text(
-              'Put your money\nto work',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.green.shade300,
-                fontSize: 38,
-                fontWeight: FontWeight.bold,
-                height: 1.1,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                'Maxing out your IRA contributions every year could grow to over \$1,000,000+ in 35 years.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.green.shade300,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'Returns aren\'t guaranteed',
-                style: TextStyle(
-                  color: Colors.green.shade300,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.green.shade300,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Page 2: 1% Reward
-  Widget _buildPage2() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 60),
-            // Circular graphic
-            CustomPaint(
-              size: const Size(220, 220),
-              painter: _CircularGraphicPainter(),
-            ),
-            const SizedBox(height: 80),
-            // Call to action
-            Text(
-              'Get rewarded\nwith 1% extra',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.green.shade300,
-                fontSize: 38,
-                fontWeight: FontWeight.bold,
-                height: 1.1,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                'Transfer any amount from outside accounts, IRAs, or old 401(k)s. We\'ll add 1%. No cap.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.green.shade300,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'Limitations apply',
-                style: TextStyle(
-                  color: Colors.green.shade300,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.green.shade300,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Page 3: Tax Advantages
-  Widget _buildPage3() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 60),
-            // Tax graphic
-            CustomPaint(
-              size: const Size(300, 180),
-              painter: _TaxGraphicPainter(),
-            ),
-            const SizedBox(height: 80),
-            // Call to action
-            Text(
-              'All with tax\nadvantages',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.green.shade300,
-                fontSize: 38,
-                fontWeight: FontWeight.bold,
-                height: 1.1,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                'Earnings have tax-deferred or tax-free growth potential, so you\'ll keep more of what you invest.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.green.shade300,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGrowthChart() {
-    return SizedBox(
-      height: 200,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _buildBar(40, 30),
-          const SizedBox(width: 16),
-          _buildBar(65, 45),
-          const SizedBox(width: 16),
-          _buildBar(95, 65),
-          const SizedBox(width: 16),
-          _buildBar(130, 85, showLabel: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBar(double growthHeight, double contributionHeight, {bool showLabel = false}) {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          if (showLabel)
-            Text(
-              '\$1M',
-              style: TextStyle(
-                color: Colors.green.shade300,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          else
-            const SizedBox(height: 14),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final total = growthHeight + contributionHeight;
-                final availableHeight = constraints.maxHeight;
-                final scale = total > availableHeight ? availableHeight / total : 1.0;
-                
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: (growthHeight * scale).clamp(10, double.infinity),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade300,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                        border: Border.all(color: Colors.black, width: 1),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: (contributionHeight * scale).clamp(10, double.infinity),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00A843),
-                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4)),
-                        border: Border.all(color: Colors.black, width: 1),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
           ),
-          const SizedBox(height: 6),
-          SizedBox(
-            height: 12,
-            child: CustomPaint(
-              painter: _TickMarksPainter(),
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black,
             ),
           ),
         ],
@@ -375,129 +449,3 @@ class _RewardsScreenState extends State<RewardsScreen> {
     );
   }
 }
-
-// Custom painters for graphics
-class _CircularGraphicPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
-
-    final center = Offset(size.width / 2, size.height / 2);
-
-    // Draw multiple rotating ellipses
-    for (int i = 0; i < 3; i++) {
-      paint.color = i == 1 ? const Color(0xFF00C853) : Colors.green.shade800;
-      canvas.save();
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(i * 0.6);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset.zero,
-          width: size.width * 0.8,
-          height: size.height * 0.4,
-        ),
-        paint,
-      );
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _TaxGraphicPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.green.shade300
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    // Draw curved text paths representing "TAXES TAXES"
-    final path1 = Path()
-      ..moveTo(size.width * 0.1, size.height * 0.5)
-      ..quadraticBezierTo(
-        size.width * 0.3,
-        size.height * 0.2,
-        size.width * 0.5,
-        size.height * 0.3,
-      );
-
-    final path2 = Path()
-      ..moveTo(size.width * 0.5, size.height * 0.3)
-      ..quadraticBezierTo(
-        size.width * 0.7,
-        size.height * 0.4,
-        size.width * 0.9,
-        size.height * 0.2,
-      );
-
-    // Draw dashed curves
-    _drawDashedPath(canvas, path1, paint);
-    _drawDashedPath(canvas, path2, paint);
-
-    // Draw text "TAXES" along paths
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'TAXES TAXE',
-        style: TextStyle(
-          color: Colors.green.shade300,
-          fontSize: 36,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    
-    canvas.save();
-    canvas.translate(size.width * 0.05, size.height * 0.35);
-    canvas.rotate(-0.2);
-    textPainter.paint(canvas, Offset.zero);
-    canvas.restore();
-  }
-
-  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
-    final dashWidth = 10.0;
-    final dashSpace = 8.0;
-    final metric = path.computeMetrics().first;
-    var distance = 0.0;
-
-    while (distance < metric.length) {
-      final start = metric.getTangentForOffset(distance)!.position;
-      distance += dashWidth;
-      final end = metric.getTangentForOffset(distance)!.position;
-      canvas.drawLine(start, end, paint);
-      distance += dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _TickMarksPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.green.shade300
-      ..strokeWidth = 1.0;
-
-    for (int i = 0; i < 8; i++) {
-      final x = size.width * i / 7;
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, 10),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-

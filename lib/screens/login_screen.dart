@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../utils/app_colors.dart';
 import '../main.dart';
 import '../providers/theme_provider.dart';
+import '../providers/language_provider.dart';
+import '../utils/translation_helper.dart';
+import '../widgets/language_toggle.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -64,15 +66,18 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
-                // Close button
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: Icon(Icons.close, color: isDark ? Colors.white : Colors.black, size: 28),
-                    onPressed: () => Navigator.of(context).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
+                // Close button and language toggle
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.close, color: isDark ? Colors.white : Colors.black, size: 28),
+                      onPressed: () => Navigator.of(context).pop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const LanguageToggle(),
+                  ],
                 ),
                 const SizedBox(height: 40),
                 // Logo
@@ -105,64 +110,84 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 48),
                 // Welcome text
-                Text(
-                  'Welcome back',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
-                    letterSpacing: -0.5,
-                  ),
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Text(
+                      context.t('welcome_back'),
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                        letterSpacing: -0.5,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Log in to continue your investment journey',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDark ? Colors.grey : Colors.grey[600],
-                  ),
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Text(
+                      context.t('login_description'),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark ? Colors.grey : Colors.grey[600],
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 48),
                 // Email field
-                _buildTextField(
-                  controller: _emailController,
-                  label: 'Email address',
-                  keyboardType: TextInputType.emailAddress,
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return _buildTextField(
+                      controller: _emailController,
+                      label: context.t('email_address'),
+                      keyboardType: TextInputType.emailAddress,
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 // Password field
-                _buildTextField(
-                  controller: _passwordController,
-                  label: 'Password',
-                  obscureText: _obscure,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      color: Colors.grey[500],
-                    ),
-                    onPressed: () => setState(() => _obscure = !_obscure),
-                  ),
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return _buildTextField(
+                      controller: _passwordController,
+                      label: context.t('password'),
+                      obscureText: _obscure,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          color: Colors.grey[500],
+                        ),
+                        onPressed: () => setState(() => _obscure = !_obscure),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 // Forgot password link
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Forgot password?',
-                      style: TextStyle(
-                        color: Color(0xFF00C853),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          context.t('forgot_password'),
+                          style: const TextStyle(
+                            color: Color(0xFF00C853),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 48),
                 // Login button
@@ -186,50 +211,58 @@ class _LoginScreenState extends State<LoginScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Log in',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      : Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return Text(
+                              context.t('log_in'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
                         ),
                 ),
                 const SizedBox(height: 40),
                 // Sign up link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Don\'t have an account? ',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 15,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SignupScreen(),
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          context.t('dont_have_account'),
+                          style: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 15,
                           ),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(
-                          color: Color(0xFF00C853),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
-                  ],
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const SignupScreen(),
+                              ),
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            context.t('sign_up'),
+                            style: const TextStyle(
+                              color: Color(0xFF00C853),
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 40),
               ],

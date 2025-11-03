@@ -1,7 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'menu_drawer_screen.dart';
+import '../widgets/language_toggle.dart';
+import '../utils/translation_helper.dart';
+import '../providers/language_provider.dart';
 
-class WalletScreen extends StatelessWidget {
+// Conditionally import QR scanner - use web version on web, mobile version otherwise
+import 'qr_scanner_screen_stub.dart'
+    if (dart.library.io) 'qr_scanner_screen.dart'
+    if (dart.library.html) 'qr_scanner_screen_web.dart';
+
+class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
+
+  @override
+  State<WalletScreen> createState() => _WalletScreenState();
+}
+
+class _WalletScreenState extends State<WalletScreen> {
+  String _amount = '0';
+
+  void _onNumberPressed(String number) {
+    setState(() {
+      if (_amount == '0' && number != '.') {
+        _amount = number;
+      } else {
+        _amount += number;
+      }
+    });
+  }
+
+  void _onBackspace() {
+    setState(() {
+      if (_amount.length > 1) {
+        _amount = _amount.substring(0, _amount.length - 1);
+      } else {
+        _amount = '0';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,388 +48,370 @@ class WalletScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
       body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
         child: Column(
           children: [
-            // Header with search and notification
+            // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Spending',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black,
+                  IconButton(
+                    icon: Icon(Icons.menu, color: isDark ? Colors.white : Colors.black),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MenuDrawerScreen(),
+                          fullscreenDialog: true,
+                        ),
+                      );
+                    },
+                  ),
+                  const LanguageToggle(),
+                  IconButton(
+                    icon: Icon(Icons.fullscreen, color: isDark ? Colors.white : Colors.black),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+            
+            // Title
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Text(
+                      context.t('pay'),
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Amount display
+            Column(
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: _amount,
+                        style: TextStyle(
+                          fontSize: 64,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'USD',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.normal,
+                          color: isDark ? Colors.grey[500] : Colors.grey[400],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.arrow_upward,
+                      size: 16,
+                      color: isDark ? Colors.grey[500] : Colors.grey[600],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '0 ETH',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark ? Colors.grey[500] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Crypto selector
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      color: Colors.purple,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Ξ',
+                      style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return Text(
+                              'ETH',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                            );
+                          },
+                        ),
+                        Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return Text(
+                              '\$0.00 ${context.t('available')}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Number keypad
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.search, color: isDark ? Colors.white : Colors.black),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.notifications_outlined, color: isDark ? Colors.white : Colors.black),
-                        onPressed: () {},
-                      ),
+                      _buildKeypadButton('1'),
+                      _buildKeypadButton('2'),
+                      _buildKeypadButton('3'),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildKeypadButton('4'),
+                      _buildKeypadButton('5'),
+                      _buildKeypadButton('6'),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildKeypadButton('7'),
+                      _buildKeypadButton('8'),
+                      _buildKeypadButton('9'),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildKeypadButton('.'),
+                      _buildKeypadButton('0'),
+                      _buildBackspaceButton(),
                     ],
                   ),
                 ],
               ),
             ),
-            // Main Content
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    // Spending Power Card
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF1A1A1A),
-                              Color(0xFF2D2D2D),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Spending power',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              '\$12,345.67',
-                              style: TextStyle(
-                                fontSize: 38,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.trending_up,
-                                  size: 16,
-                                  color: Color(0xFF00C853),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '+\$234.56 (1.9%) today',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[400],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+            
+            const SizedBox(height: 20),
+            
+            // Action buttons
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Quick Action Buttons
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: const Text(
-                                'Deposit',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () {},
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                              ),
-                              child: Text(
-                                'Transfer',
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    // Portfolio Breakdown
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Portfolio',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('receive'),
+                style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: isDark ? Colors.white : Colors.black,
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildPortfolioItem(
-                            context,
-                            'Buying Power',
-                            '\$8,234.50',
-                            Colors.green[700]!,
-                            0.67,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPortfolioItem(
-                            context,
-                            'Stocks',
-                            '\$3,456.12',
-                            Colors.blue[700]!,
-                            0.28,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPortfolioItem(
-                            context,
-                            'Crypto',
-                            '\$655.05',
-                            Colors.orange[700]!,
-                            0.05,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    // Recent Activity
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Recent activity',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              'See all',
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildActivityItem(
-                      context,
-                      'Deposit from Bank',
-                      'Jan 25, 2025',
-                      '+\$5,000.00',
-                      Colors.green[700]!,
-                      Icons.arrow_downward,
-                    ),
-                    _buildActivityItem(
-                      context,
-                      'Bought BTC',
-                      'Jan 23, 2025',
-                      '-\$1,200.00',
-                      isDark ? Colors.white : Colors.black,
-                      Icons.shopping_cart_outlined,
-                    ),
-                    _buildActivityItem(
-                      context,
-                      'Dividend from AAPL',
-                      'Jan 20, 2025',
-                      '+\$45.23',
-                      Colors.green[700]!,
-                      Icons.trending_up,
-                    ),
-                    _buildActivityItem(
-                      context,
-                      'Sold ETH',
-                      'Jan 18, 2025',
-                      '+\$2,340.56',
-                      Colors.green[700]!,
-                      Icons.sell_outlined,
-                    ),
-                    _buildActivityItem(
-                      context,
-                      'Transfer to Savings',
-                      'Jan 15, 2025',
-                      '-\$500.00',
-                      isDark ? Colors.white : Colors.black,
-                      Icons.account_balance,
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                          );
+                        },
                 ),
               ),
             ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _amount != '0' ? () async {
+                        // Navigate to QR scanner
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QRScannerScreen(
+                              amount: _amount,
+                              currency: 'USD',
+                            ),
+                          ),
+                        );
+
+                        // Handle the result
+                        if (result != null && result['success'] == true && mounted) {
+                          // Reset the amount after successful payment
+                          setState(() {
+                            _amount = '0';
+                          });
+
+                          // Show success message
+                          final lang = Provider.of<LanguageProvider>(context, listen: false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                lang.isSpanish 
+                                  ? '✅ Pago de \$${result['amount']} enviado exitosamente!'
+                                  : '✅ Payment of \$${result['amount']} sent successfully!',
+                              ),
+                              backgroundColor: const Color(0xFF4CAF50),
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      } : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        disabledBackgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('pay_button'),
+                style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: _amount != '0' ? Colors.white : Colors.grey[600],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildPortfolioItem(BuildContext context, String label, String amount, Color color, double percentage) {
+  Widget _buildKeypadButton(String number) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
+    return InkWell(
+      onTap: () => _onNumberPressed(number),
+      borderRadius: BorderRadius.circular(40),
+      child: Container(
+        width: 70,
+        height: 70,
+        alignment: Alignment.center,
+        child: Text(
+          number,
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.white : Colors.black,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${(percentage * 100).toStringAsFixed(0)}% of portfolio',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildActivityItem(BuildContext context, String title, String date, String amount, Color color, IconData icon) {
+  Widget _buildBackspaceButton() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[200]!, width: 1),
+    return InkWell(
+      onTap: _onBackspace,
+      borderRadius: BorderRadius.circular(40),
+      child: Container(
+        width: 70,
+        height: 70,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.backspace_outlined,
+          size: 24,
+          color: isDark ? Colors.white : Colors.black,
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[800] : Colors.grey[100],
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: isDark ? Colors.grey[400] : Colors.black87, size: 22),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  date,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
       ),
     );
   }
 }
-

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
+import '../utils/translation_helper.dart';
 import '../main.dart';
 import '../providers/theme_provider.dart';
+import '../providers/language_provider.dart';
+import '../widgets/language_toggle.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -27,7 +30,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  List<Widget> _buildProgressBars() {
+  List<Widget> _buildProgressBars(bool isDark) {
     return List.generate(
       6,
       (i) => Expanded(
@@ -35,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 2),
           height: 3,
           decoration: BoxDecoration(
-            color: i <= _currentStep ? AppColors.primaryGreen : AppColors.darkGray,
+            color: i <= _currentStep ? AppColors.primaryGreen : (isDark ? Colors.grey[800] : Colors.grey[300]),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -75,24 +78,33 @@ class _SignupScreenState extends State<SignupScreen> {
                         Navigator.of(context).pop();
                       }
                     },
-                    icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                    icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Create your account',
-                          style: AppTextStyles.title,
+                        Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return Text(
+                              context.t('create_account'),
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 8),
                         Row(
-                          children: _buildProgressBars(),
+                          children: _buildProgressBars(isDark),
                         ),
                       ],
                     ),
                   ),
+                  const LanguageToggle(),
                 ],
               ),
             ),
@@ -104,11 +116,11 @@ class _SignupScreenState extends State<SignupScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-                    if (_currentStep == 0) _buildStep1Country(),
-                    if (_currentStep == 1) _buildStep2Email(),
-                    if (_currentStep == 2) _buildStep3Name(),
-                    if (_currentStep == 3) _buildStep4Password(),
-                    if (_currentStep == 4) _buildStep5Confirm(),
+                    if (_currentStep == 0) _buildStep1Country(isDark),
+                    if (_currentStep == 1) _buildStep2Email(isDark),
+                    if (_currentStep == 2) _buildStep3Name(isDark),
+                    if (_currentStep == 3) _buildStep4Password(isDark),
+                    if (_currentStep == 4) _buildStep5Confirm(isDark),
                   ],
                 ),
               ),
@@ -119,32 +131,40 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildStep1Country() {
+  Widget _buildStep1Country(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Where do you live?',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('where_live'),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Choose the country or region where you currently live and pay taxes.',
-          style: TextStyle(color: AppColors.textSecondary),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('choose_country'),
+              style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+            );
+          },
         ),
         const SizedBox(height: 30),
         GestureDetector(
           onTap: () async {
             final result = await showModalBottomSheet<String>(
               context: context,
-              backgroundColor: AppColors.cardBackground,
+              backgroundColor: isDark ? Colors.grey[900] : Colors.white,
               builder: (context) => Container(
                 decoration: BoxDecoration(
-                  color: AppColors.cardBackground,
+                  color: isDark ? Colors.grey[900] : Colors.white,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 child: Column(
@@ -155,24 +175,35 @@ class _SignupScreenState extends State<SignupScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.textSecondary,
+                        color: isDark ? Colors.grey[700] : Colors.grey[300],
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    ...[
-                      'United States',
-                      'Canada',
-                      'United Kingdom',
-                      'Mexico',
-                      'Other'
-                    ].map((country) => ListTile(
-                      title: Text(
-                        country,
-                        style: const TextStyle(color: AppColors.textPrimary),
-                      ),
-                      onTap: () => Navigator.of(context).pop(country),
-                    )),
+                    Consumer<LanguageProvider>(
+                      builder: (context, lang, _) {
+                        final countries = [
+                          context.t('united_states'),
+                          context.t('canada'),
+                          context.t('united_kingdom'),
+                          context.t('mexico'),
+                          context.t('other'),
+                        ];
+                        final countryKeys = ['United States', 'Canada', 'United Kingdom', 'Mexico', 'Other'];
+                        
+                        return Column(
+                          children: List.generate(countries.length, (index) {
+                            return ListTile(
+                              title: Text(
+                                countries[index],
+                                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                              ),
+                              onTap: () => Navigator.of(context).pop(countryKeys[index]),
+                            );
+                          }),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 10),
                   ],
                 ),
@@ -182,20 +213,26 @@ class _SignupScreenState extends State<SignupScreen> {
           },
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.borderGray),
+              border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _country ?? 'Select your country or region',
-                  style: TextStyle(
-                    color: _country == null ? AppColors.textSecondary : AppColors.textPrimary,
-                  ),
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Text(
+                      _country ?? context.t('select_country'),
+                      style: TextStyle(
+                        color: _country == null 
+                          ? (isDark ? Colors.grey[500] : Colors.grey[400]) 
+                          : (isDark ? Colors.white : Colors.black),
+                      ),
+                    );
+                  },
                 ),
-                const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+                Icon(Icons.arrow_drop_down, color: isDark ? Colors.grey[500] : Colors.grey[400]),
               ],
             ),
           ),
@@ -211,12 +248,16 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text(
-            'Continue',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Consumer<LanguageProvider>(
+            builder: (context, lang, _) {
+              return Text(
+                context.t('continue'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -224,42 +265,54 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildStep2Email() {
+  Widget _buildStep2Email(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'What\'s your email?',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('whats_email'),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
-        const Text(
-          'We\'ll use this email to keep your account secure and send you important updates.',
-          style: TextStyle(color: AppColors.textSecondary),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('email_description'),
+              style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+            );
+          },
         ),
         const SizedBox(height: 30),
-        TextField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: 'Email',
-            hintStyle: const TextStyle(color: AppColors.textSecondary),
-            filled: true,
-            fillColor: AppColors.cardBackground,
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.borderGray),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.primaryGreen),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              decoration: InputDecoration(
+                hintText: context.t('email'),
+                hintStyle: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[400]),
+                filled: true,
+                fillColor: isDark ? Colors.grey[900] : Colors.grey[100],
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: AppColors.primaryGreen),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 300),
         ElevatedButton(
@@ -272,12 +325,16 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text(
-            'Continue',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Consumer<LanguageProvider>(
+            builder: (context, lang, _) {
+              return Text(
+                context.t('continue'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -285,41 +342,53 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildStep3Name() {
+  Widget _buildStep3Name(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'What\'s your name?',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('whats_name'),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
-        const Text(
-          'This is how we\'ll address you in the app.',
-          style: TextStyle(color: AppColors.textSecondary),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('name_description'),
+              style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+            );
+          },
         ),
         const SizedBox(height: 30),
-        TextField(
-          controller: _nameController,
-          style: const TextStyle(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: 'Full name',
-            hintStyle: const TextStyle(color: AppColors.textSecondary),
-            filled: true,
-            fillColor: AppColors.cardBackground,
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.borderGray),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.primaryGreen),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return TextField(
+              controller: _nameController,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              decoration: InputDecoration(
+                hintText: context.t('full_name'),
+                hintStyle: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[400]),
+                filled: true,
+                fillColor: isDark ? Colors.grey[900] : Colors.grey[100],
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: AppColors.primaryGreen),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 300),
         ElevatedButton(
@@ -332,12 +401,16 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text(
-            'Continue',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Consumer<LanguageProvider>(
+            builder: (context, lang, _) {
+              return Text(
+                context.t('continue'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -345,49 +418,61 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildStep4Password() {
+  Widget _buildStep4Password(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Create a password',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('create_password'),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Use at least 8 characters with a mix of letters and numbers.',
-          style: TextStyle(color: AppColors.textSecondary),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('password_description'),
+              style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+            );
+          },
         ),
         const SizedBox(height: 30),
-        TextField(
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          style: const TextStyle(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: 'Password',
-            hintStyle: const TextStyle(color: AppColors.textSecondary),
-            filled: true,
-            fillColor: AppColors.cardBackground,
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.borderGray),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.primaryGreen),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.textSecondary,
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return TextField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              decoration: InputDecoration(
+                hintText: context.t('password'),
+                hintStyle: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[400]),
+                filled: true,
+                fillColor: isDark ? Colors.grey[900] : Colors.grey[100],
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: AppColors.primaryGreen),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: isDark ? Colors.grey[500] : Colors.grey[400],
+                  ),
+                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                ),
               ),
-              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-            ),
-          ),
+            );
+          },
         ),
         const SizedBox(height: 300),
         ElevatedButton(
@@ -400,12 +485,16 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text(
-            'Continue',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Consumer<LanguageProvider>(
+            builder: (context, lang, _) {
+              return Text(
+                context.t('continue'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -413,22 +502,31 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildStep5Confirm() {
+  Widget _buildStep5Confirm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'You\'re all set!',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            return Text(
+              context.t('all_set'),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
-        Text(
-          'Welcome to Caballo, ${_nameController.text.isEmpty ? 'there' : _nameController.text.split(' ').first}!',
-          style: const TextStyle(color: AppColors.textSecondary),
+        Consumer<LanguageProvider>(
+          builder: (context, lang, _) {
+            final name = _nameController.text.isEmpty ? 'there' : _nameController.text.split(' ').first;
+            return Text(
+              '${context.t('welcome_user')}, $name!',
+              style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+            );
+          },
         ),
         const SizedBox(height: 48),
         Center(
@@ -460,13 +558,17 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text(
-            'Start Trading',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-            ),
+          child: Consumer<LanguageProvider>(
+            builder: (context, lang, _) {
+              return Text(
+                context.t('start_trading'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -474,4 +576,3 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
-

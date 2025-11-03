@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
+import '../utils/translation_helper.dart';
+import '../widgets/language_toggle.dart';
+import '../providers/language_provider.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
 
@@ -25,24 +29,36 @@ class WelcomeScreen extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 48),
+                // Language toggle in top right
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: const LanguageToggle(),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 // Title Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Text(
-                        'Welcome to',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black87,
-                        ),
+                    children: [
+                      Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('welcome'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black87,
+                            ),
+                          );
+                        },
                       ),
-                      SizedBox(height: 4),
-                      Text(
+                      const SizedBox(height: 4),
+                      const Text(
                         'Caballo',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -51,15 +67,19 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Get access to the tools you need to invest, spend, and put your money in motion.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black87,
-                          height: 1.4,
-                        ),
+                      const SizedBox(height: 16),
+                      Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('get_started'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                              height: 1.4,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -98,13 +118,17 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text(
-                        'Log in',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('log_in'),
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -125,13 +149,17 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('sign_up'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
