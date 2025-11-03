@@ -13,26 +13,40 @@ class ThemeProvider with ChangeNotifier {
   }
 
   void _loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getBool('isDarkMode') ?? true;
-    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isDark = prefs.getBool('isDarkMode') ?? true;
+      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+      notifyListeners();
+    } catch (e) {
+      // If shared_preferences fails, use default theme
+      _themeMode = ThemeMode.dark;
+      notifyListeners();
+    }
   }
 
   void toggleTheme() async {
     _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     notifyListeners();
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', _themeMode == ThemeMode.dark);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isDarkMode', _themeMode == ThemeMode.dark);
+    } catch (e) {
+      // If shared_preferences fails, continue with theme change
+    }
   }
 
   void setThemeMode(ThemeMode mode) async {
     _themeMode = mode;
     notifyListeners();
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', mode == ThemeMode.dark);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isDarkMode', mode == ThemeMode.dark);
+    } catch (e) {
+      // If shared_preferences fails, continue with theme change
+    }
   }
 }
 
