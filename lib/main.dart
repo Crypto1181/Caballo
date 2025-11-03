@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'screens/welcome_screen.dart';
 import 'screens/wallet_screen.dart';
 import 'screens/investing_screen.dart';
@@ -14,6 +15,15 @@ import 'providers/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Add error handler for web
+  if (kIsWeb) {
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('Flutter Error: ${details.exception}');
+      debugPrint('Stack trace: ${details.stack}');
+    };
+  }
   
   runApp(
     MultiProvider(
