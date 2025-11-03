@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/Caballo/">
+  <meta charset="UTF-8">
+  <title>Debug Test</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 20px;
+    }
+    .test { margin: 10px 0; padding: 10px; background: #222; }
+    .pass { color: #0f0; }
+    .fail { color: #f00; }
+  </style>
+</head>
+<body>
+  <h1>Flutter Web Debug Test</h1>
+  <div id="tests"></div>
+  <script>
+    const tests = [];
+    function test(name, fn) {
+      try {
+        const result = fn();
+        tests.push({name, pass: !!result, error: result ? null : 'Test returned false'});
+      } catch(e) {
+        tests.push({name, pass: false, error: e.message});
+      }
+    }
+    
+    test('Base href exists', () => document.querySelector('base')?.href.includes('/Caballo/'));
+    test('Can access window', () => typeof window !== 'undefined');
+    test('Can create elements', () => {
+      const div = document.createElement('div');
+      return div.tagName === 'DIV';
+    });
+    
+    // Check if files exist
+    fetch('flutter_bootstrap.js')
+      .then(r => tests.push({name: 'flutter_bootstrap.js exists', pass: r.ok, error: r.ok ? null : `Status: ${r.status}`}))
+      .catch(e => tests.push({name: 'flutter_bootstrap.js exists', pass: false, error: e.message}))
+      .finally(() => renderTests());
+    
+    function renderTests() {
+      const container = document.getElementById('tests');
+      tests.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'test ' + (t.pass ? 'pass' : 'fail');
+        div.textContent = (t.pass ? '✓' : '✗') + ' ' + t.name;
+        if (t.error) {
+          const err = document.createElement('div');
+          err.style.color = '#faa';
+          err.style.fontSize = '12px';
+          err.textContent = '  Error: ' + t.error;
+          div.appendChild(err);
+        }
+        container.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
+
