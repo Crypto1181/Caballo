@@ -101,6 +101,12 @@
       }
     }, 15000);
   </script>
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Load bootstrap synchronously to ensure proper initialization order
+    const script = document.createElement('script');
+    script.src = 'flutter_bootstrap.js';
+    script.type = 'application/javascript';
+    document.head.appendChild(script);
+  </script>
 </body>
 </html>
