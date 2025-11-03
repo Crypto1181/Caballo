@@ -31,8 +31,53 @@
 
   <title>caballo</title>
   <link rel="manifest" href="manifest.json">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .loading-text {
+      color: #00C853;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 200, 83, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #00C853;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Caballo...</div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      const loading = document.querySelector('#loading');
+      if (loading) {
+        loading.remove();
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
