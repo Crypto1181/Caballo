@@ -71,12 +71,35 @@
     <div class="loading-text">Loading Caballo...</div>
   </div>
   <script>
+    // Error handler for debugging
+    window.addEventListener('error', function(e) {
+      console.error('JavaScript Error:', e.error, e.filename, e.lineno);
+      const loading = document.querySelector('#loading');
+      if (loading) {
+        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Error: ' + e.message + '<br>Check browser console for details.</div>';
+      }
+    });
+    
+    // Remove loading screen when Flutter app loads
     window.addEventListener('flutter-first-frame', function () {
       const loading = document.querySelector('#loading');
       if (loading) {
-        loading.remove();
+        loading.style.transition = 'opacity 0.5s';
+        loading.style.opacity = '0';
+        setTimeout(function() {
+          loading.remove();
+        }, 500);
       }
     });
+    
+    // Fallback: remove loading screen after 15 seconds if app hasn't loaded
+    setTimeout(function() {
+      const loading = document.querySelector('#loading');
+      if (loading && loading.style.opacity !== '0') {
+        console.warn('App did not load within 15 seconds - checking for errors');
+        loading.innerHTML = '<div style="color: #ff9800; text-align: center; padding: 20px;">Taking longer than expected...<br>Please check browser console or try refreshing.</div>';
+      }
+    }, 15000);
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
