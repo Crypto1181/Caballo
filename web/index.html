@@ -64,6 +64,52 @@
       100% { transform: rotate(360deg); }
     }
   </style>
+  <script>
+    // Set up error handlers IMMEDIATELY, before any other scripts load
+    (function() {
+      // Suppress nativeCommunication errors from plugins on web
+      function shouldSuppressError(error) {
+        if (!error) return false;
+        const errorStr = error.toString() + (error.message || '') + (error.stack || '');
+        return errorStr.includes('nativeCommunication') || 
+               errorStr.includes('Cannot set properties of undefined');
+      }
+      
+      // Enhanced error handler for debugging
+      window.addEventListener('error', function(e) {
+        // Suppress nativeCommunication errors from plugins on web
+        if (shouldSuppressError(e.error) || shouldSuppressError(e.message)) {
+          console.warn('Suppressed plugin initialization error (expected on web):', e.message);
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+        
+        console.error('JavaScript Error:', e.error, e.filename, e.lineno);
+        const loading = document.querySelector('#loading');
+        if (loading) {
+          loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Error: ' + e.message + '<br>File: ' + (e.filename || 'unknown') + '<br>Line: ' + (e.lineno || 'unknown') + '<br>Check browser console (F12) for details.</div>';
+        }
+      }, true); // Use capture phase to catch errors early
+      
+      // Handle unhandled promise rejections
+      window.addEventListener('unhandledrejection', function(e) {
+        // Suppress nativeCommunication errors from plugins on web
+        const errorMsg = e.reason?.toString() || '';
+        if (shouldSuppressError(e.reason) || shouldSuppressError(errorMsg)) {
+          console.warn('Suppressed plugin promise rejection (expected on web):', errorMsg);
+          e.preventDefault();
+          return;
+        }
+        
+        console.error('Unhandled Promise Rejection:', e.reason);
+        const loading = document.querySelector('#loading');
+        if (loading && loading.style.opacity !== '0') {
+          loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Promise Error: ' + errorMsg + '<br>Check browser console (F12) for details.</div>';
+        }
+      });
+    })();
+  </script>
 </head>
 <body>
   <div class="loading" id="loading">
@@ -71,38 +117,6 @@
     <div class="loading-text">Loading Caballo...</div>
   </div>
   <script>
-    // Enhanced error handler for debugging
-    window.addEventListener('error', function(e) {
-      // Suppress nativeCommunication errors from plugins on web
-      if (e.message && e.message.includes('nativeCommunication')) {
-        console.warn('Suppressed nativeCommunication error (expected on web):', e.message);
-        e.preventDefault();
-        return;
-      }
-      
-      console.error('JavaScript Error:', e.error, e.filename, e.lineno);
-      const loading = document.querySelector('#loading');
-      if (loading) {
-        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Error: ' + e.message + '<br>File: ' + (e.filename || 'unknown') + '<br>Line: ' + (e.lineno || 'unknown') + '<br>Check browser console (F12) for details.</div>';
-      }
-    });
-    
-    // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', function(e) {
-      // Suppress nativeCommunication errors from plugins on web
-      const errorMsg = e.reason?.toString() || '';
-      if (errorMsg.includes('nativeCommunication')) {
-        console.warn('Suppressed nativeCommunication promise rejection (expected on web):', errorMsg);
-        e.preventDefault();
-        return;
-      }
-      
-      console.error('Unhandled Promise Rejection:', e.reason);
-      const loading = document.querySelector('#loading');
-      if (loading && loading.style.opacity !== '0') {
-        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Promise Error: ' + errorMsg + '<br>Check browser console (F12) for details.</div>';
-      }
-    });
     
     // Remove loading screen when Flutter app loads
     window.addEventListener('flutter-first-frame', function () {
@@ -116,6 +130,24 @@
         }, 500);
       }
     });
+    
+    // Also try to remove loading screen after a delay if app seems to have loaded
+    // (in case flutter-first-frame event doesn't fire due to suppressed errors)
+    setTimeout(function() {
+      const loading = document.querySelector('#loading');
+      if (loading && loading.style.opacity !== '0') {
+        // Check if Flutter app has actually loaded by looking for Flutter elements
+        const flutterElements = document.querySelectorAll('[data-flutter-view]');
+        if (flutterElements.length > 0) {
+          console.log('Flutter app detected, removing loading screen');
+          loading.style.transition = 'opacity 0.5s';
+          loading.style.opacity = '0';
+          setTimeout(function() {
+            loading.remove();
+          }, 500);
+        }
+      }
+    }, 3000); // Check after 3 seconds
     
     // Check if Flutter bootstrap script exists
     function checkFlutterBootstrap() {
