@@ -21,7 +21,7 @@ import 'services/stripe_config.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 // Uncomment the line below and run once to configure your credentials
 // import 'utils/configure_alpaca.dart';
-import 'utils/configure_privy.dart';
+// import 'utils/configure_privy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
