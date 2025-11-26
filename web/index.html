@@ -69,27 +69,29 @@
     // This must happen before Flutter loads to prevent nativeCommunication errors
     (function() {
       if (typeof window !== 'undefined') {
-        // Create nativeCommunication object first
+        // Create nativeCommunication object first - this will always exist
         const safeNativeCommunication = {};
         
-        // Initialize Flutter platform structure immediately
+        // Initialize Flutter object if it doesn't exist
         if (!window._flutter) {
           window._flutter = {};
         }
         
         // Create platform object with nativeCommunication already set
+        // Use Object.defineProperty to make it non-configurable
         if (!window._flutter.platform) {
-          window._flutter.platform = {
-            nativeCommunication: safeNativeCommunication
-          };
-        } else {
-          // Ensure nativeCommunication exists
-          if (!window._flutter.platform.nativeCommunication) {
-            window._flutter.platform.nativeCommunication = safeNativeCommunication;
-          }
+          window._flutter.platform = {};
         }
         
-        // Use Proxy to intercept ALL property access on platform object
+        // Define nativeCommunication property directly - make it always exist
+        Object.defineProperty(window._flutter.platform, 'nativeCommunication', {
+          value: safeNativeCommunication,
+          writable: true,
+          configurable: false, // Make it non-configurable so it can't be deleted
+          enumerable: true
+        });
+        
+        // Also protect the platform object itself - use Proxy to catch any access
         const originalPlatform = window._flutter.platform;
         window._flutter.platform = new Proxy(originalPlatform, {
           get: function(target, prop) {
@@ -97,21 +99,14 @@
             if (prop === 'nativeCommunication') {
               return safeNativeCommunication;
             }
-            // For other properties, return from target or create empty object
-            if (prop in target) {
-              return target[prop];
-            }
-            // Return empty object for any missing property
-            return {};
+            // For other properties, return from target
+            return target[prop];
           },
           set: function(target, prop, value) {
-            // Always allow setting nativeCommunication
+            // Always allow setting nativeCommunication (merge objects)
             if (prop === 'nativeCommunication') {
-              // Merge with existing object if value is an object
-              if (typeof value === 'object' && value !== null) {
+              if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
                 Object.assign(safeNativeCommunication, value);
-              } else {
-                target[prop] = safeNativeCommunication;
               }
               return true;
             }
@@ -127,24 +122,41 @@
             return prop in target;
           },
           ownKeys: function(target) {
-            // Include nativeCommunication in keys
             const keys = Object.keys(target);
             if (!keys.includes('nativeCommunication')) {
               keys.push('nativeCommunication');
             }
             return keys;
+          },
+          getOwnPropertyDescriptor: function(target, prop) {
+            if (prop === 'nativeCommunication') {
+              return {
+                value: safeNativeCommunication,
+                writable: true,
+                configurable: false,
+                enumerable: true
+              };
+            }
+            return Object.getOwnPropertyDescriptor(target, prop);
           }
         });
         
-        // Also ensure it's directly accessible as a fallback
-        Object.defineProperty(window._flutter.platform, 'nativeCommunication', {
-          value: safeNativeCommunication,
-          writable: true,
-          configurable: true,
+        // Protect window._flutter.platform from being overwritten
+        Object.defineProperty(window._flutter, 'platform', {
+          get: function() {
+            return window._flutter.platform;
+          },
+          set: function(value) {
+            // If someone tries to overwrite platform, merge it with our protected version
+            if (value && typeof value === 'object') {
+              Object.assign(window._flutter.platform, value);
+            }
+          },
+          configurable: false,
           enumerable: true
         });
         
-        console.log('Flutter platform structure initialized with Proxy protection');
+        console.log('Flutter platform structure initialized with full protection');
       }
     })();
     
