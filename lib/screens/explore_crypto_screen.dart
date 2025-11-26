@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'stock_detail_screen.dart';
 import 'menu_drawer_screen.dart';
-import '../widgets/language_toggle.dart';
+import '../widgets/theme_language_controls.dart';
 import '../utils/translation_helper.dart';
 import '../providers/language_provider.dart';
 
@@ -50,26 +50,30 @@ class _ExploreCryptoScreenState extends State<ExploreCryptoScreen> {
                         color: isDark ? Colors.grey[900] : Colors.grey[100],
                         borderRadius: BorderRadius.circular(24),
                       ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search',
-                          hintStyle: TextStyle(
-                            color: isDark ? Colors.grey[600] : Colors.grey[400],
-                              fontSize: 16,
-                          ),
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return TextField(
+                            decoration: InputDecoration(
+                              hintText: context.t('search'),
+                              hintStyle: TextStyle(
+                                color: isDark ? Colors.grey[600] : Colors.grey[400],
+                                fontSize: 16,
+                              ),
                           prefixIcon: Icon(
                             Icons.search,
                             color: isDark ? Colors.grey[600] : Colors.grey[400],
                           ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        ),
-                        style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                          );
+                        },
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LanguageToggle(),
+                  const ThemeLanguageControls(),
                   const SizedBox(width: 8),
                   IconButton(
                     icon: Icon(Icons.notifications_outlined, color: isDark ? Colors.white : Colors.black),
@@ -188,24 +192,28 @@ class _ExploreCryptoScreenState extends State<ExploreCryptoScreen> {
                   const SizedBox(height: 16),
                   
                   // Browse all button
-                  OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-              child: Text(
-                      'Browse all',
-                style: TextStyle(
-                        fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                    ),
-                ),
+                  Consumer<LanguageProvider>(
+                    builder: (context, lang, _) {
+                      return OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          context.t('browse_all'),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   
                   const SizedBox(height: 16),
                 ],
@@ -215,26 +223,30 @@ class _ExploreCryptoScreenState extends State<ExploreCryptoScreen> {
             // Buy & sell button
             Padding(
               padding: const EdgeInsets.all(24),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+              child: Consumer<LanguageProvider>(
+                builder: (context, lang, _) {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        context.t('buy_sell'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Buy & sell',
-                style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           ],

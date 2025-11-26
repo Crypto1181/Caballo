@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'menu_drawer_screen.dart';
-import '../widgets/language_toggle.dart';
+import '../widgets/theme_language_controls.dart';
 import '../utils/translation_helper.dart';
 import '../providers/language_provider.dart';
 
@@ -76,7 +75,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       );
                     },
                   ),
-                  const LanguageToggle(),
+                  const ThemeLanguageControls(),
                   IconButton(
                     icon: Icon(Icons.fullscreen, color: isDark ? Colors.white : Colors.black),
                     onPressed: () {},

@@ -71,17 +71,27 @@
     <div class="loading-text">Loading Caballo...</div>
   </div>
   <script>
-    // Error handler for debugging
+    // Enhanced error handler for debugging
     window.addEventListener('error', function(e) {
       console.error('JavaScript Error:', e.error, e.filename, e.lineno);
       const loading = document.querySelector('#loading');
       if (loading) {
-        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Error: ' + e.message + '<br>Check browser console for details.</div>';
+        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Error: ' + e.message + '<br>File: ' + (e.filename || 'unknown') + '<br>Line: ' + (e.lineno || 'unknown') + '<br>Check browser console (F12) for details.</div>';
+      }
+    });
+    
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled Promise Rejection:', e.reason);
+      const loading = document.querySelector('#loading');
+      if (loading && loading.style.opacity !== '0') {
+        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Promise Error: ' + (e.reason?.toString() || 'Unknown error') + '<br>Check browser console (F12) for details.</div>';
       }
     });
     
     // Remove loading screen when Flutter app loads
     window.addEventListener('flutter-first-frame', function () {
+      console.log('Flutter app loaded successfully');
       const loading = document.querySelector('#loading');
       if (loading) {
         loading.style.transition = 'opacity 0.5s';
@@ -92,21 +102,38 @@
       }
     });
     
-    // Fallback: remove loading screen after 15 seconds if app hasn't loaded
+    // Check if Flutter bootstrap script exists
+    function checkFlutterBootstrap() {
+      const script = document.createElement('script');
+      script.src = 'flutter_bootstrap.js';
+      script.type = 'application/javascript';
+      script.onerror = function() {
+        console.error('Failed to load flutter_bootstrap.js');
+        const loading = document.querySelector('#loading');
+        if (loading) {
+          loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Failed to load Flutter bootstrap script.<br>Make sure the app was built correctly.<br>Check browser console (F12) for details.</div>';
+        }
+      };
+      script.onload = function() {
+        console.log('Flutter bootstrap script loaded');
+      };
+      document.head.appendChild(script);
+    }
+    
+    // Start loading Flutter bootstrap
+    checkFlutterBootstrap();
+    
+    // Fallback: show warning after 15 seconds if app hasn't loaded
     setTimeout(function() {
       const loading = document.querySelector('#loading');
       if (loading && loading.style.opacity !== '0') {
         console.warn('App did not load within 15 seconds - checking for errors');
-        loading.innerHTML = '<div style="color: #ff9800; text-align: center; padding: 20px;">Taking longer than expected...<br>Please check browser console or try refreshing.</div>';
+        const currentContent = loading.innerHTML;
+        if (!currentContent.includes('Error') && !currentContent.includes('Failed')) {
+          loading.innerHTML = '<div style="color: #ff9800; text-align: center; padding: 20px;">Taking longer than expected...<br>Please check browser console (F12) or try refreshing.<br><br><button onclick="location.reload()" style="padding: 10px 20px; background: #00C853; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Refresh Page</button></div>';
+        }
       }
     }, 15000);
-  </script>
-  <script>
-    // Load bootstrap synchronously to ensure proper initialization order
-    const script = document.createElement('script');
-    script.src = 'flutter_bootstrap.js';
-    script.type = 'application/javascript';
-    document.head.appendChild(script);
   </script>
 </body>
 </html>

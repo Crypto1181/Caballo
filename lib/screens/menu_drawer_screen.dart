@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'settings_screen.dart';
 import 'generate_qr_screen.dart';
+import 'order_history_screen.dart';
 import '../utils/translation_helper.dart';
 import '../providers/language_provider.dart';
+import '../services/supabase_service.dart';
 
 class MenuDrawerScreen extends StatelessWidget {
   const MenuDrawerScreen({super.key});
@@ -63,23 +65,19 @@ class MenuDrawerScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Michael Harper',
+                                  SupabaseService.currentUser?.email?.split('@').first ?? 'User',
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: isDark ? Colors.white : Colors.black,
                                   ),
                                 ),
-                                Consumer<LanguageProvider>(
-                                  builder: (context, lang, _) {
-                                    return Text(
-                                      context.t('account_settings'),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                      ),
-                                    );
-                                  },
+                                Text(
+                                  SupabaseService.currentUser?.email ?? '',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  ),
                                 ),
                               ],
                             ),
@@ -218,6 +216,15 @@ class MenuDrawerScreen extends StatelessWidget {
                               icon: Icons.trending_up,
                               title: context.t('limit_orders'),
                               isDark: isDark,
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const OrderHistoryScreen(),
+                                  ),
+                                );
+                              },
                             ),
                             _buildMenuItem(
                               icon: Icons.show_chart,

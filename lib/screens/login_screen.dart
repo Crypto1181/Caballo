@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../main.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
 import '../utils/translation_helper.dart';
-import '../widgets/language_toggle.dart';
+import '../widgets/theme_language_controls.dart';
 import 'signup_screen.dart';
+import 'login_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,28 +16,22 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscure = true;
-  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() async {
-    setState(() => _isLoading = true);
-    
-    // Simulate login delay
-    await Future.delayed(const Duration(milliseconds: 800));
-    
-    if (mounted) {
-      setState(() => _isLoading = false);
-      Navigator.of(context).pushReplacement(
+  void _handleContinue() {
+    if (_formKey.currentState!.validate()) {
+      // Navigate to password screen
+      Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const MainScreen(),
+          builder: (_) => LoginPasswordScreen(
+            email: _emailController.text.trim(),
+          ),
         ),
       );
     }
@@ -47,198 +41,48 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
+    final horseAsset = isDark
+        ? 'assets/images/dark mode.png'
+        : 'assets/images/for light mode.jpeg';
     
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => themeProvider.toggleTheme(),
-        backgroundColor: const Color(0xFF00C853),
-        child: Icon(
-          isDark ? Icons.light_mode : Icons.dark_mode,
-          color: Colors.white,
-        ),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                // Close button and language toggle
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.close, color: isDark ? Colors.white : Colors.black, size: 28),
-                      onPressed: () => Navigator.of(context).pop(),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    const LanguageToggle(),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                // Logo
-                Center(
-                  child: Container(
-                    height: 180,
-                    width: 180,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(90),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: Image.asset(
-                      'assets/images/icon.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stack) => const Icon(
-                        Icons.savings,
-                        size: 100,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 48),
-                // Welcome text
-                Consumer<LanguageProvider>(
-                  builder: (context, lang, _) {
-                    return Text(
-                      context.t('welcome_back'),
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black,
-                        letterSpacing: -0.5,
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12),
-                Consumer<LanguageProvider>(
-                  builder: (context, lang, _) {
-                    return Text(
-                      context.t('login_description'),
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: isDark ? Colors.grey : Colors.grey[600],
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 48),
-                // Email field
-                Consumer<LanguageProvider>(
-                  builder: (context, lang, _) {
-                    return _buildTextField(
-                      controller: _emailController,
-                      label: context.t('email_address'),
-                      keyboardType: TextInputType.emailAddress,
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Password field
-                Consumer<LanguageProvider>(
-                  builder: (context, lang, _) {
-                    return _buildTextField(
-                      controller: _passwordController,
-                      label: context.t('password'),
-                      obscureText: _obscure,
-                      suffixIcon: IconButton(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 20),
+                  
+                  // Top controls
+                  Row(
+                    children: [
+                      IconButton(
                         icon: Icon(
-                          _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          color: Colors.grey[500],
+                          Icons.close,
+                          color: isDark ? Colors.white : Colors.black,
+                          size: 28,
                         ),
-                        onPressed: () => setState(() => _obscure = !_obscure),
+                        onPressed: () => Navigator.of(context).pop(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                // Forgot password link
-                Consumer<LanguageProvider>(
-                  builder: (context, lang, _) {
-                    return Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: Text(
-                          context.t('forgot_password'),
-                          style: const TextStyle(
-                            color: Color(0xFF00C853),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                      const Spacer(),
+                      ThemeLanguageControls(
+                        spacing: 6,
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 48),
-                // Login button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00C853),
-                    disabledBackgroundColor: const Color(0xFF00C853).withOpacity(0.6),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    elevation: 0,
+                    ],
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Consumer<LanguageProvider>(
-                          builder: (context, lang, _) {
-                            return Text(
-                              context.t('log_in'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          },
-                        ),
-                ),
-                const SizedBox(height: 40),
-                // Sign up link
-                Consumer<LanguageProvider>(
-                  builder: (context, lang, _) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          context.t('dont_have_account'),
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 15,
-                          ),
-                        ),
-                        TextButton(
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Consumer<LanguageProvider>(
+                      builder: (context, lang, _) {
+                        return TextButton(
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -246,83 +90,311 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                           },
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
                           child: Text(
                             context.t('sign_up'),
                             style: const TextStyle(
-                              color: Color(0xFF00C853),
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0052FF),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
+                        );
+                      },
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 48),
+                  
+                  // Logo
+                  Center(
+                    child: SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Image.asset(
+                        horseAsset,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stack) => Icon(
+                          Icons.currency_bitcoin,
+                          color: isDark ? Colors.white : Colors.black,
+                          size: 50,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // Title
+                  Consumer<LanguageProvider>(
+                    builder: (context, lang, _) {
+                      return Text(
+                        context.t('sign_in_to_coinbase'),
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      );
+                    },
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // Email label
+                  Consumer<LanguageProvider>(
+                    builder: (context, lang, _) {
+                      return Text(
+                        context.t('email'),
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      );
+                    },
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Email field
+                  Consumer<LanguageProvider>(
+                    builder: (context, lang, _) {
+                      return TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: 16,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: context.t('your_email_address'),
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[600] : Colors.grey[400],
+                    ),
+                    filled: true,
+                    fillColor: isDark ? Colors.grey[900] : Colors.grey[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.white : Colors.black,
+                        width: 2,
+                      ),
+                    ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, 
+                            vertical: 16
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!value.contains('@')) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                      );
+                    },
+                  ),
+                
+                const SizedBox(height: 40),
+                
+                // Continue button
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _handleContinue,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? Colors.white : Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          context.t('continue'),
+                          style: TextStyle(
+                            color: isDark ? Colors.black : Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                
+                const SizedBox(height: 30),
+                
+                // OR divider
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: isDark ? Colors.grey[700] : Colors.grey[300],
+                        thickness: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, lang, _) {
+                          return Text(
+                            context.t('or'),
+                            style: TextStyle(
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: isDark ? Colors.grey[700] : Colors.grey[300],
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 30),
+                
+                // Alternative sign-in options
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return Column(
+                      children: [
+                        _buildAlternativeButton(
+                          icon: Icons.key,
+                          label: context.t('sign_in_with_passkey'),
+                          isDark: isDark,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAlternativeButton(
+                          icon: Icons.g_mobiledata,
+                          label: context.t('sign_in_with_google'),
+                          isDark: isDark,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAlternativeButton(
+                          icon: Icons.apple,
+                          label: context.t('sign_in_with_apple'),
+                          isDark: isDark,
                         ),
                       ],
                     );
                   },
                 ),
+                
+                const SizedBox(height: 60),
+                
+                // Privacy notice
+                Consumer<LanguageProvider>(
+                  builder: (context, lang, _) {
+                    return RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          fontSize: 13,
+                          height: 1.4,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: context.t('cookie_policy_text'),
+                          ),
+                          TextSpan(
+                            text: context.t('cookie_policy'),
+                            style: const TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Color(0xFF0052FF),
+                            ),
+                          ),
+                          TextSpan(text: context.t('and')),
+                          TextSpan(
+                            text: context.t('privacy_policy'),
+                            style: const TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Color(0xFF0052FF),
+                            ),
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                
                 const SizedBox(height: 40),
               ],
             ),
+              ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
+  Widget _buildAlternativeButton({
+    required IconData icon,
     required String label,
-    bool obscureText = false,
-    TextInputType? keyboardType,
-    Widget? suffixIcon,
+    required bool isDark,
   }) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDark = themeProvider.isDarkMode;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: isDark ? Colors.grey[400] : Colors.grey[700],
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => _handleContinue(),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(
+            color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
+        ),
+        icon: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: icon == Icons.g_mobiledata ? Colors.white : Colors.transparent,
+          ),
+          child: Icon(
+            icon,
+            color: icon == Icons.g_mobiledata 
+                ? Colors.black 
+                : (isDark ? Colors.white : Colors.black),
+            size: 20,
           ),
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
+        label: Text(
+          label,
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 16,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: isDark ? Colors.grey[900] : Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF00C853), width: 2),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-            suffixIcon: suffixIcon,
+            fontWeight: FontWeight.w500,
           ),
         ),
-      ],
+      ),
     );
   }
 }

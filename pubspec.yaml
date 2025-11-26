@@ -47,6 +47,9 @@ dependencies:
   webview_flutter: ^4.8.0
   candlesticks: ^2.1.0
   web_socket_channel: ^2.4.4
+  lottie: ^3.1.0
+  supabase_flutter: ^2.10.3
+  flutter_stripe: ^10.1.1
 
 dev_dependencies:
   flutter_test:
@@ -72,10 +75,13 @@ flutter:
 
   # Add the app image asset for Caballo (place your horse image here)
   assets:
-    - assets/images/horse.png
+    - assets/images/for light mode.jpeg
+    - assets/images/dark mode.png
     - assets/images/background.png
-    - assets/images/icon.png
     - assets/html/
+    - assets/Bitcoin trade.json
+    - assets/Graph 1.json
+    - assets/Wyda graph animation.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -12,10 +12,64 @@ import 'utils/app_colors.dart';
 import 'utils/translation_helper.dart';
 import 'providers/theme_provider.dart';
 import 'providers/language_provider.dart';
+import 'services/supabase_service.dart';
+import 'services/alpaca_config.dart';
+import 'services/alpaca_service.dart';
+import 'services/privy_config.dart';
+import 'services/privy_service.dart';
+import 'services/stripe_config.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+// Uncomment the line below and run once to configure your credentials
+// import 'utils/configure_alpaca.dart';
+import 'utils/configure_privy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Initialize Supabase
+  await SupabaseService.initialize();
+
+  // Load Alpaca configuration from storage
+  await AlpacaConfig.instance.loadFromStorage();
+
+  // Initialize Alpaca Service if credentials are available
+  if (AlpacaConfig.instance.isConfigured) {
+    AlpacaService.instance.initialize(
+      apiKeyId: AlpacaConfig.instance.apiKeyId!,
+      apiSecretKey: AlpacaConfig.instance.apiSecretKey!,
+      brokerId: AlpacaConfig.instance.brokerId,
+      useProduction: AlpacaConfig.instance.useProduction,
+    );
+  }
+
+  // Load Privy configuration from storage
+  await PrivyConfig.instance.loadFromStorage();
+
+  // Initialize Privy Service if credentials are available
+  if (PrivyConfig.instance.isConfigured) {
+    PrivyService.instance.initialize(
+      appId: PrivyConfig.instance.appId!,
+      appSecret: PrivyConfig.instance.appSecret!,
+      useProduction: PrivyConfig.instance.useProduction,
+    );
+  }
+
+  // Load Stripe configuration from storage
+  await StripeConfig.instance.loadFromStorage();
+
+  // Initialize Stripe if configured
+  if (StripeConfig.instance.isConfigured) {
+    Stripe.publishableKey = StripeConfig.instance.publishableKey!;
+    Stripe.merchantIdentifier = 'merchant.caballo';
+    // Note: For production, you may want to set Stripe.instance.applySettings()
+  }
+
+  // Uncomment the line below to configure Alpaca credentials (run once)
+  // await configureAlpacaCredentials();
+
+  // Configure Privy credentials (run once, then comment back out)
+  // await configurePrivyCredentials();
+
   // Add error handler for web
   if (kIsWeb) {
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -24,7 +78,7 @@ void main() async {
       debugPrint('Stack trace: ${details.stack}');
     };
   }
-  
+
   runApp(
     MultiProvider(
       providers: [
@@ -43,25 +97,22 @@ class CaballoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LanguageProvider>(
       builder: (context, themeProvider, languageProvider, child) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Caballo',
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Caballo',
           themeMode: themeProvider.themeMode,
-      locale: languageProvider.locale,
-      supportedLocales: const [
-        Locale('en'),
-        Locale('es'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: ThemeData(
-        brightness: Brightness.light,
+          locale: languageProvider.locale,
+          supportedLocales: const [Locale('en'), Locale('es')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: ThemeData(
+            brightness: Brightness.light,
             primaryColor: AppColors.primaryGreen,
-        scaffoldBackgroundColor: Colors.white,
-        useMaterial3: true,
+            scaffoldBackgroundColor: Colors.white,
+            useMaterial3: true,
             appBarTheme: const AppBarTheme(
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
@@ -73,7 +124,7 @@ class CaballoApp extends StatelessWidget {
             scaffoldBackgroundColor: AppColors.background,
             useMaterial3: true,
             appBarTheme: const AppBarTheme(
-                            backgroundColor: Colors.black,
+              backgroundColor: Colors.black,
               foregroundColor: Colors.white,
             ),
           ),
@@ -106,20 +157,20 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: _screens[_currentIndex],
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark ? Colors.black : Colors.white,
+          color: isDark ? AppColors.background : Colors.white,
           border: Border(
             top: BorderSide(
               color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
               width: 1,
-                          ),
-                        ),
-                      ),
+            ),
+          ),
+        ),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
@@ -177,7 +228,7 @@ class _MainScreenState extends State<MainScreen> {
     required bool isDark,
   }) {
     final isSelected = _currentIndex == index;
-    
+
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _currentIndex = index),
@@ -199,7 +250,7 @@ class _MainScreenState extends State<MainScreen> {
                 builder: (context, lang, _) {
                   return Text(
                     context.t(labelKey),
-                style: TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       color: isSelected

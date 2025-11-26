@@ -1,0 +1,37 @@
+{
+  "id": "a0c4628c-1d9b-9a6a-6e12-d055e5490de2",
+  "object": "chat.completion",
+  "created": 1763966606,
+  "model": "grok-3-mini",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "hello world",
+        "reasoning_content": "First, the user said: \"Say hello world only.\" This seems like a straightforward request. They want me to output exactly \"hello world\".\n\nBut my system prompt is: \"You are a helpful assistant.\" I need to respond in a way that's helpful and aligns with that.\n\nThe user specified \"only,\" which might mean they want just that phrase without any additional text. So, I should avoid adding extras like greetings or explanations.\n\nIn my previous interactions, I've been adding more context, but here, the instruction is clear: \"Say hello world only.\"\n\nIs \"hello world\" meant to be \"Hello, World!\" like the famous programming phrase? Probably, but they wrote it as \"hello world,\" so I'll stick to that exactly.\n\nMy response should be precise. If I say anything else, it might not fulfill the \"only\" part.\n\nPossible response: Just \"hello world\"\n\nShould I capitalize it? The user didn't specify, but typically it's \"Hello World\" with capitals. However, they said \"hello world,\" so I'll keep it lowercase to match.\n\nIn programming, it's often \"Hello, World!\" but again, matching the user's input.\n\nTo be exact: \"Say hello world only.\" So, literally, say \"hello world\".\n\nAs an AI assistant, I should ensure my response is helpful. By following their instruction directly, I'm being helpful.\n\nFinally, end my response there, without any follow-up.\n\nResponse: hello world",
+        "refusal": null
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 22,
+    "completion_tokens": 2,
+    "total_tokens": 315,
+    "prompt_tokens_details": {
+      "text_tokens": 22,
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "cached_tokens": 7
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 291,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "num_sources_used": 0
+  },
+  "system_fingerprint": "fp_77fb3022a9"
+}

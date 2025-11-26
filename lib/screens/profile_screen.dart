@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'menu_drawer_screen.dart';
-import '../widgets/language_toggle.dart';
+import '../widgets/theme_language_controls.dart';
 import '../utils/translation_helper.dart';
 import '../providers/language_provider.dart';
 
@@ -13,6 +13,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  // ignore: unused_field
   String _selectedFilter = 'All';
 
   @override
@@ -72,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LanguageToggle(),
+                  const ThemeLanguageControls(),
                   const SizedBox(width: 8),
                   IconButton(
                     icon: Icon(Icons.notifications_outlined, color: isDark ? Colors.white : Colors.black),
@@ -295,8 +296,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildFilterChip(IconData? icon, String? label) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isAll = icon != null;
-    
     return GestureDetector(
       onTap: () => setState(() => _selectedFilter = label ?? 'All'),
               child: Container(

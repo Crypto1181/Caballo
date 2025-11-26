@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/supabase_service.dart';
+import 'welcome_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -121,6 +123,16 @@ class SettingsScreen extends StatelessWidget {
                     isDark: isDark,
                     onTap: () {},
                   ),
+                  Divider(
+                    height: 1,
+                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                  ),
+                  _buildSettingItem(
+                    icon: Icons.logout,
+                    title: 'Logout',
+                    isDark: isDark,
+                    onTap: () => _handleLogout(context),
+                  ),
                 ],
               ),
             ),
@@ -185,6 +197,72 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _handleLogout(BuildContext context) async {
+    // Show confirmation dialog
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        final isDark = Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+          title: Text(
+            'Logout',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(
+              color: isDark ? Colors.grey[300] : Colors.grey[700],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      try {
+        await SupabaseService.signOut();
+        if (context.mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+            (route) => false,
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error logging out: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   Widget _buildSettingCard({required bool isDark, required Widget child}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -219,7 +297,7 @@ class SettingsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: isSelected 
-                  ? const Color(0xFF00C853).withOpacity(0.1)
+                  ? const Color(0xFF00C853).withValues(alpha: 0.1)
                   : (isDark ? Colors.grey[800] : Colors.grey[200]),
                 borderRadius: BorderRadius.circular(10),
               ),

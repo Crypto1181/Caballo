@@ -1,0 +1,5 @@
+# Supabase Edge Functions
+node_modules/
+.env
+*.log
+

@@ -33,7 +33,7 @@ class LanguageToggle extends StatelessWidget {
               height: 32,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.blue,
+                color: isDark ? Colors.white : Colors.black,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),

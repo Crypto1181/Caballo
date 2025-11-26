@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import '../widgets/order_placement_dialog.dart';
 
 class StockDetailScreen extends StatefulWidget {
   final String symbol;
@@ -285,7 +286,17 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
             ),
             child: SafeArea(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => OrderPlacementDialog(
+                      symbol: widget.symbol,
+                      name: widget.name,
+                      currentPrice: widget.price,
+                      isPositive: widget.isPositive,
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00C853),
                   padding: const EdgeInsets.symmetric(vertical: 16),
