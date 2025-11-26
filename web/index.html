@@ -149,6 +149,32 @@
       }
     }, 3000); // Check after 3 seconds
     
+    // Patch window object to prevent nativeCommunication errors
+    // This must happen before Flutter loads
+    (function() {
+      if (typeof window !== 'undefined') {
+        // Create a safe object for plugin initialization
+        if (!window._flutter) {
+          window._flutter = {};
+        }
+        if (!window._flutter.platform) {
+          window._flutter.platform = {};
+        }
+        // Provide a safe nativeCommunication object
+        Object.defineProperty(window._flutter.platform, 'nativeCommunication', {
+          get: function() {
+            return {};
+          },
+          set: function(value) {
+            // Silently accept any value
+            console.warn('Plugin attempted to set nativeCommunication (suppressed on web)');
+          },
+          configurable: true,
+          enumerable: true
+        });
+      }
+    })();
+    
     // Check if Flutter bootstrap script exists
     function checkFlutterBootstrap() {
       const script = document.createElement('script');
