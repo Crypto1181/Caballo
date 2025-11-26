@@ -73,14 +73,42 @@
         if (!window._flutter) {
           window._flutter = {};
         }
+        
+        // Create a safe platform object with Proxy to catch all property access
         if (!window._flutter.platform) {
-          window._flutter.platform = {};
-        }
-        // Create nativeCommunication object that plugins can safely use
-        if (!window._flutter.platform.nativeCommunication) {
+          const safeNativeCommunication = {};
+          
+          // Use Proxy to intercept all property access and creation
+          window._flutter.platform = new Proxy({}, {
+            get: function(target, prop) {
+              if (prop === 'nativeCommunication') {
+                return safeNativeCommunication;
+              }
+              // For any other property, return an empty object or the property if it exists
+              return target[prop] || {};
+            },
+            set: function(target, prop, value) {
+              if (prop === 'nativeCommunication') {
+                // Silently accept the value
+                console.warn('Plugin attempted to set nativeCommunication (accepted on web)');
+                return true;
+              }
+              target[prop] = value;
+              return true;
+            },
+            has: function(target, prop) {
+              return prop === 'nativeCommunication' || prop in target;
+            }
+          });
+          
+          // Also set it directly as a fallback
+          window._flutter.platform.nativeCommunication = safeNativeCommunication;
+        } else if (!window._flutter.platform.nativeCommunication) {
+          // If platform exists but nativeCommunication doesn't, add it
           window._flutter.platform.nativeCommunication = {};
         }
-        console.log('Flutter platform structure initialized');
+        
+        console.log('Flutter platform structure initialized with Proxy protection');
       }
     })();
     
