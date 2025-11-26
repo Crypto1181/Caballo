@@ -73,6 +73,13 @@
   <script>
     // Enhanced error handler for debugging
     window.addEventListener('error', function(e) {
+      // Suppress nativeCommunication errors from plugins on web
+      if (e.message && e.message.includes('nativeCommunication')) {
+        console.warn('Suppressed nativeCommunication error (expected on web):', e.message);
+        e.preventDefault();
+        return;
+      }
+      
       console.error('JavaScript Error:', e.error, e.filename, e.lineno);
       const loading = document.querySelector('#loading');
       if (loading) {
@@ -82,10 +89,18 @@
     
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', function(e) {
+      // Suppress nativeCommunication errors from plugins on web
+      const errorMsg = e.reason?.toString() || '';
+      if (errorMsg.includes('nativeCommunication')) {
+        console.warn('Suppressed nativeCommunication promise rejection (expected on web):', errorMsg);
+        e.preventDefault();
+        return;
+      }
+      
       console.error('Unhandled Promise Rejection:', e.reason);
       const loading = document.querySelector('#loading');
       if (loading && loading.style.opacity !== '0') {
-        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Promise Error: ' + (e.reason?.toString() || 'Unknown error') + '<br>Check browser console (F12) for details.</div>';
+        loading.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Promise Error: ' + errorMsg + '<br>Check browser console (F12) for details.</div>';
       }
     });
     
