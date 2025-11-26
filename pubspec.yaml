@@ -43,7 +43,7 @@ dependencies:
   http: ^1.2.0
   mobile_scanner: ^5.2.3
   qr_flutter: ^4.1.0
-  flutter_inappwebview: ^6.0.0
+  # flutter_inappwebview: ^6.0.0  # Removed for web compatibility - using stubs instead
   webview_flutter: ^4.8.0
   candlesticks: ^2.1.0
   web_socket_channel: ^2.4.4
