@@ -3,8 +3,8 @@ name: Deploy Flutter Web to GitHub Pages
 on:
   push:
     branches:
-      - main  # Change to 'master' if your default branch is 'master'
-  workflow_dispatch:  # Allows manual triggering
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -50,4 +50,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
