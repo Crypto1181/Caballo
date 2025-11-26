@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' if (dart.library.html) 'package:flutter_inappwebview/flutter_inappwebview_stub.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as ws_status;
 import '../providers/language_provider.dart';
@@ -201,27 +202,29 @@ class _CryptoDetailScreenState extends State<CryptoDetailScreen> {
               height: 300,
               child: Stack(
                 children: [
-                  InAppWebView(
-                    initialFile: 'assets/html/chart.html',
-                    initialOptions: InAppWebViewGroupOptions(
-                      crossPlatform: InAppWebViewOptions(
-                        javaScriptEnabled: true,
-                        transparentBackground: true,
-                      ),
-                    ),
-                    onWebViewCreated: (c) => _controller = c,
-                    onLoadStop: (c, url) async {
-                      if (mounted)
-                        setState(() {
-                          _loading = false;
-                        });
-                      _fetchPrice();
-                      _waitForInit().then((_) async {
-                        await _injectData(isDark);
-                        _startLive();
-                      });
-                    },
-                  ),
+                  kIsWeb
+                      ? _buildWebChart(isDark)
+                      : InAppWebView(
+                          initialFile: 'assets/html/chart.html',
+                          initialOptions: InAppWebViewGroupOptions(
+                            crossPlatform: InAppWebViewOptions(
+                              javaScriptEnabled: true,
+                              transparentBackground: true,
+                            ),
+                          ),
+                          onWebViewCreated: (c) => _controller = c,
+                          onLoadStop: (c, url) async {
+                            if (mounted)
+                              setState(() {
+                                _loading = false;
+                              });
+                            _fetchPrice();
+                            _waitForInit().then((_) async {
+                              await _injectData(isDark);
+                              _startLive();
+                            });
+                          },
+                        ),
                   if (_loading)
                     const Center(child: CircularProgressIndicator()),
                   if (_error != null)
@@ -362,6 +365,32 @@ class _CryptoDetailScreenState extends State<CryptoDetailScreen> {
               ),
             ),
             const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebChart(bool isDark) {
+    // Web-compatible chart placeholder
+    return Container(
+      color: isDark ? Colors.grey[900] : Colors.grey[100],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.show_chart,
+              size: 48,
+              color: isDark ? Colors.grey[600] : Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Chart view available on mobile',
+              style: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
           ],
         ),
       ),

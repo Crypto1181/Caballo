@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'crypto_detail_screen.dart';
 import 'stock_detail_screen.dart';
 import 'menu_drawer_screen.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' if (dart.library.html) 'package:flutter_inappwebview/flutter_inappwebview_stub.dart';
 import 'package:http/http.dart' as http;
 import '../widgets/theme_language_controls.dart';
 import '../utils/translation_helper.dart';
@@ -176,85 +177,85 @@ class _InvestingScreenState extends State<InvestingScreen> {
     // Add default crypto watchlist if no positions
     if (watchlist.isEmpty) {
       watchlist.addAll([
-        {
-          'coinId': 'bitcoin',
-          'symbol': 'BTC',
-          'name': 'Bitcoin',
-          'icon': '₿',
-          'iconColor': Colors.orange,
-          'price': '\$111,362.18',
-          'change': -2.96,
-          'isPositive': false,
-        },
-        {
-          'coinId': 'ethereum',
-          'symbol': 'ETH',
-          'name': 'Ethereum',
-          'icon': 'Ξ',
-          'iconColor': Colors.blue,
-          'price': '\$3,245.67',
-          'change': 1.45,
-          'isPositive': true,
-        },
-        {
-          'coinId': 'solana',
-          'symbol': 'SOL',
-          'name': 'Solana',
-          'icon': '◎',
-          'iconColor': Colors.purple,
-          'price': '\$156.89',
-          'change': 3.21,
-          'isPositive': true,
-        },
-        {
-          'coinId': 'cardano',
-          'symbol': 'ADA',
-          'name': 'Cardano',
-          'icon': '₳',
-          'iconColor': Colors.teal,
-          'price': '\$0.52',
-          'change': -0.87,
-          'isPositive': false,
-        },
-        {
-          'coinId': 'dogecoin',
-          'symbol': 'DOGE',
-          'name': 'Dogecoin',
-          'icon': 'Ð',
-          'iconColor': Colors.amber,
-          'price': '\$0.083',
-          'change': 2.34,
-          'isPositive': true,
-        },
-        {
-          'coinId': 'polygon',
-          'symbol': 'MATIC',
-          'name': 'Polygon',
-          'icon': '⬟',
-          'iconColor': Colors.indigo,
-          'price': '\$0.89',
-          'change': -1.12,
-          'isPositive': false,
-        },
-        {
-          'coinId': 'binancecoin',
-          'symbol': 'BNB',
-          'name': 'BNB',
-          'icon': 'BNB',
-          'iconColor': Colors.yellow,
-          'price': '\$612.45',
-          'change': 0.56,
-          'isPositive': true,
-        },
-        {
-          'coinId': 'ripple',
-          'symbol': 'XRP',
-          'name': 'Ripple',
-          'icon': '✕',
-          'iconColor': Colors.blueGrey,
-          'price': '\$0.62',
-          'change': 1.89,
-          'isPositive': true,
+    {
+      'coinId': 'bitcoin',
+      'symbol': 'BTC',
+      'name': 'Bitcoin',
+      'icon': '₿',
+      'iconColor': Colors.orange,
+      'price': '\$111,362.18',
+      'change': -2.96,
+      'isPositive': false,
+    },
+    {
+      'coinId': 'ethereum',
+      'symbol': 'ETH',
+      'name': 'Ethereum',
+      'icon': 'Ξ',
+      'iconColor': Colors.blue,
+      'price': '\$3,245.67',
+      'change': 1.45,
+      'isPositive': true,
+    },
+    {
+      'coinId': 'solana',
+      'symbol': 'SOL',
+      'name': 'Solana',
+      'icon': '◎',
+      'iconColor': Colors.purple,
+      'price': '\$156.89',
+      'change': 3.21,
+      'isPositive': true,
+    },
+    {
+      'coinId': 'cardano',
+      'symbol': 'ADA',
+      'name': 'Cardano',
+      'icon': '₳',
+      'iconColor': Colors.teal,
+      'price': '\$0.52',
+      'change': -0.87,
+      'isPositive': false,
+    },
+    {
+      'coinId': 'dogecoin',
+      'symbol': 'DOGE',
+      'name': 'Dogecoin',
+      'icon': 'Ð',
+      'iconColor': Colors.amber,
+      'price': '\$0.083',
+      'change': 2.34,
+      'isPositive': true,
+    },
+    {
+      'coinId': 'polygon',
+      'symbol': 'MATIC',
+      'name': 'Polygon',
+      'icon': '⬟',
+      'iconColor': Colors.indigo,
+      'price': '\$0.89',
+      'change': -1.12,
+      'isPositive': false,
+    },
+    {
+      'coinId': 'binancecoin',
+      'symbol': 'BNB',
+      'name': 'BNB',
+      'icon': 'BNB',
+      'iconColor': Colors.yellow,
+      'price': '\$612.45',
+      'change': 0.56,
+      'isPositive': true,
+    },
+    {
+      'coinId': 'ripple',
+      'symbol': 'XRP',
+      'name': 'Ripple',
+      'icon': '✕',
+      'iconColor': Colors.blueGrey,
+      'price': '\$0.62',
+      'change': 1.89,
+      'isPositive': true,
           'type': 'crypto',
         },
       ]);
@@ -266,100 +267,100 @@ class _InvestingScreenState extends State<InvestingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _loadPortfolioData,
-          child: SingleChildScrollView(
+        child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with menu, search, notifications, language toggle
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      IconButton(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with menu, search, notifications, language toggle
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
                         icon: Icon(
                           Icons.menu,
                           color: isDark ? Colors.white : Colors.black,
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const MenuDrawerScreen(),
-                              fullscreenDialog: true,
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: isDark ? Colors.grey[900] : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(24),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MenuDrawerScreen(),
+                            fullscreenDialog: true,
                           ),
-                          child: Consumer<LanguageProvider>(
-                            builder: (context, lang, _) {
-                              return TextField(
-                                decoration: InputDecoration(
-                                  hintText: context.t('search'),
-                                  hintStyle: TextStyle(
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[900] : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return TextField(
+                              decoration: InputDecoration(
+                                hintText: context.t('search'),
+                                hintStyle: TextStyle(
                                     color: isDark
                                         ? Colors.grey[600]
                                         : Colors.grey[400],
-                                    fontSize: 16,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.search,
+                                  fontSize: 16,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.search,
                                     color: isDark
                                         ? Colors.grey[600]
                                         : Colors.grey[400],
-                                  ),
-                                  border: InputBorder.none,
+                                ),
+                                border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 14,
-                                  ),
+                              ),
                                 ),
                                 style: TextStyle(
                                   color: isDark ? Colors.white : Colors.black,
                                 ),
-                              );
-                            },
-                          ),
+                            );
+                          },
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const ThemeLanguageControls(),
-                      const SizedBox(width: 8),
-                      IconButton(
+                    ),
+                    const SizedBox(width: 8),
+                    const ThemeLanguageControls(),
+                    const SizedBox(width: 8),
+          IconButton(
                         icon: Icon(
                           Icons.notifications_outlined,
                           color: isDark ? Colors.white : Colors.black,
                         ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Portfolio balance
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+            onPressed: () {},
+          ),
+        ],
+      ),
+              ),
+              
+              // Portfolio balance
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+                    Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                             if (_isLoadingPortfolio)
                               const SizedBox(
                                 height: 48,
@@ -367,30 +368,30 @@ class _InvestingScreenState extends State<InvestingScreen> {
                                 child: CircularProgressIndicator(),
                               )
                             else
-                              Text(
+                          Text(
                                 _getPortfolioValue(),
-                                style: TextStyle(
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Text(
+                    style: TextStyle(
+                              fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
                                   _getPortfolioChange(),
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                style: TextStyle(
+                                  fontSize: 16,
                                     color: isDark
                                         ? Colors.grey[400]
                                         : Colors.grey[600],
-                                  ),
                                 ),
-                                const SizedBox(width: 8),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 14,
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
                                   color: isDark
                                       ? Colors.grey[400]
                                       : Colors.grey[600],
@@ -407,242 +408,244 @@ class _InvestingScreenState extends State<InvestingScreen> {
                                     color: Colors.red,
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      // Up arrow button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[900] : Colors.grey[100],
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.keyboard_arrow_up,
-                            color: isDark ? Colors.white : Colors.black,
-                            size: 28,
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const MenuDrawerScreen(),
-                                fullscreenDialog: true,
-                              ),
-                            );
-                          },
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // TradingView Chart
-                Container(
-                  height: 200,
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[900] : Colors.grey[50],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: InAppWebView(
-                      initialFile: 'assets/html/chart.html',
-                      initialOptions: InAppWebViewGroupOptions(
-                        crossPlatform: InAppWebViewOptions(
-                          javaScriptEnabled: true,
-                          transparentBackground: true,
-                        ),
+                    ),
+                    // Up arrow button
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[900] : Colors.grey[100],
+                        shape: BoxShape.circle,
                       ),
-                      onWebViewCreated: (c) => _chartController = c,
-                      onLoadStop: (c, url) async {
-                        await _initChart(isDark);
-                      },
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.keyboard_arrow_up,
+                          color: isDark ? Colors.white : Colors.black,
+                          size: 28,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MenuDrawerScreen(),
+                              fullscreenDialog: true,
+                            ),
+                          );
+                        },
                     ),
                   ),
+                ],
+              ),
+            ),
+              
+              const SizedBox(height: 24),
+              
+              // TradingView Chart
+              Container(
+                height: 200,
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[900] : Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
                 ),
-
-                const SizedBox(height: 16),
-
-                // Time period selector
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildPeriodButton('1H'),
-                      _buildPeriodButton('1D'),
-                      _buildPeriodButton('1W'),
-                      _buildPeriodButton('1M'),
-                      _buildPeriodButton('1Y'),
-                      _buildPeriodButton('All'),
-                    ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                    child: kIsWeb
+                        ? _buildWebChart(isDark)
+                        : InAppWebView(
+                    initialFile: 'assets/html/chart.html',
+                    initialOptions: InAppWebViewGroupOptions(
+                      crossPlatform: InAppWebViewOptions(
+                        javaScriptEnabled: true,
+                        transparentBackground: true,
+                      ),
+                    ),
+                    onWebViewCreated: (c) => _chartController = c,
+                    onLoadStop: (c, url) async {
+                      await _initChart(isDark);
+                    },
                   ),
                 ),
-
-                const SizedBox(height: 24),
-
-                // Promotional banner
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[900] : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Consumer<LanguageProvider>(
-                              builder: (context, lang, _) {
-                                return Text(
-                                  context.t('pay_anyone'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.white : Colors.black,
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 8),
-                            Consumer<LanguageProvider>(
-                              builder: (context, lang, _) {
-                                return Text(
-                                  context.t('send_crypto'),
-                                  style: TextStyle(
-                                    fontSize: 14,
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Time period selector
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildPeriodButton('1H'),
+                    _buildPeriodButton('1D'),
+                    _buildPeriodButton('1W'),
+                    _buildPeriodButton('1M'),
+                    _buildPeriodButton('1Y'),
+                    _buildPeriodButton('All'),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Promotional banner
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[900] : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Consumer<LanguageProvider>(
+                            builder: (context, lang, _) {
+                              return Text(
+                                context.t('pay_anyone'),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          Consumer<LanguageProvider>(
+                            builder: (context, lang, _) {
+                              return Text(
+                                context.t('send_crypto'),
+                                style: TextStyle(
+                                  fontSize: 14,
                                     color: isDark
                                         ? Colors.grey[400]
                                         : Colors.grey[600],
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[800] : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.send_rounded,
-                          color: Colors.blue,
-                          size: 32,
-                        ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[800] : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      IconButton(
+                      child: Icon(
+                        Icons.send_rounded,
+                        color: Colors.blue,
+                        size: 32,
+                      ),
+                    ),
+                    IconButton(
                         icon: Icon(
                           Icons.close,
                           color: isDark ? Colors.grey[500] : Colors.grey,
                         ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
+                      onPressed: () {},
+                    ),
+                  ],
                 ),
-
-                const SizedBox(height: 24),
-
-                // Crypto section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: [
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Crypto section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
                       Icon(
                         Icons.show_chart,
                         size: 24,
                         color: isDark ? Colors.white : Colors.black,
                       ),
-                      const SizedBox(width: 12),
-                      Consumer<LanguageProvider>(
-                        builder: (context, lang, _) {
-                          return Text(
-                            context.t('crypto_section'),
-                            style: TextStyle(
-                              fontSize: 18,
+                    const SizedBox(width: 12),
+                    Consumer<LanguageProvider>(
+                      builder: (context, lang, _) {
+                        return Text(
+                          context.t('crypto_section'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        );
+                      },
+                    ),
+                    const Spacer(),
+                    Consumer<LanguageProvider>(
+                      builder: (context, lang, _) {
+                        return TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            context.t('buy'),
+                            style: const TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : Colors.black,
+                              color: Colors.blue,
                             ),
-                          );
-                        },
-                      ),
-                      const Spacer(),
-                      Consumer<LanguageProvider>(
-                        builder: (context, lang, _) {
-                          return TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              context.t('buy'),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-
-                const Divider(height: 1),
-
-                const SizedBox(height: 16),
-
-                // Cash section with APY
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.green[100],
-                          shape: BoxShape.circle,
-                        ),
+              ),
+              
+              const Divider(height: 1),
+              
+            const SizedBox(height: 16),
+              
+              // Cash section with APY
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                      children: [
+                        Container(
+                      width: 40,
+                      height: 40,
+                          decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        shape: BoxShape.circle,
+                          ),
                         child: Icon(
                           Icons.account_balance_wallet,
                           color: Colors.green[700],
                           size: 20,
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Consumer<LanguageProvider>(
-                              builder: (context, lang, _) {
-                                return Text(
-                                  context.t('cash'),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark ? Colors.white : Colors.black,
-                                  ),
-                                );
-                              },
-                            ),
+                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Consumer<LanguageProvider>(
+                                builder: (context, lang, _) {
+                                  return Text(
+                                    context.t('cash'),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark ? Colors.white : Colors.black,
+                                    ),
+                                  );
+                                },
+                              ),
                             Text(
                               _availableBalance != null
                                   ? '\$${_availableBalance!.toStringAsFixed(2)}'
                                   : 'Loading...',
-                              style: TextStyle(
+                                    style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? Colors.white : Colors.black,
@@ -656,131 +659,131 @@ class _InvestingScreenState extends State<InvestingScreen> {
                                   color: Colors.orange,
                                 ),
                               ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Consumer<LanguageProvider>(
-                        builder: (context, lang, _) {
-                          return TextButton(
+                    Consumer<LanguageProvider>(
+                      builder: (context, lang, _) {
+                        return TextButton(
                             onPressed: _handleDeposit,
-                            child: Text(
-                              context.t('deposit'),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.blue,
-                              ),
+                          child: Text(
+                            context.t('deposit'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue,
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-
-                const SizedBox(height: 24),
-
-                // Watchlist section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Consumer<LanguageProvider>(
-                        builder: (context, lang, _) {
-                          return Text(
-                            context.t('watchlist'),
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Watchlist section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Consumer<LanguageProvider>(
+                      builder: (context, lang, _) {
+                        return Text(
+                          context.t('watchlist'),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
                         icon: Icon(
                           Icons.arrow_forward,
                           color: isDark ? Colors.white : Colors.black,
                         ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // Watchlist items
-                ..._buildWatchlistItems(isDark),
-
-                const SizedBox(height: 16),
-
-                // Action buttons
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
+                      onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+              
+              const SizedBox(height: 8),
+              
+              // Watchlist items
+              ..._buildWatchlistItems(isDark),
+              
+              const SizedBox(height: 16),
+              
+              // Action buttons
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          Expanded(
+                      child: OutlinedButton(
                           onPressed: _handleDeposit,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                             side: BorderSide(
                               color: isDark
                                   ? Colors.grey[700]!
                                   : Colors.grey[300]!,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Consumer<LanguageProvider>(
-                            builder: (context, lang, _) {
-                              return Text(
-                                context.t('deposit'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? Colors.white : Colors.black,
-                                ),
-                              );
-                            },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Consumer<LanguageProvider>(
-                            builder: (context, lang, _) {
-                              return Text(
-                                context.t('buy_sell_button'),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              );
-                            },
-                          ),
+                        child: Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return Text(
+                              context.t('deposit'),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Consumer<LanguageProvider>(
+                          builder: (context, lang, _) {
+                            return Text(
+                              context.t('buy_sell_button'),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        ),
+            ),
+          ),
+        ],
                 ),
-
-                const SizedBox(height: 32),
-              ],
+              ),
+              
+              const SizedBox(height: 32),
+            ],
             ), // Column closes
           ), // SingleChildScrollView closes
         ), // RefreshIndicator closes
@@ -788,10 +791,36 @@ class _InvestingScreenState extends State<InvestingScreen> {
     ); // Scaffold closes
   }
 
+  Widget _buildWebChart(bool isDark) {
+    // Web-compatible chart placeholder
+    return Container(
+      color: isDark ? Colors.grey[900] : Colors.grey[100],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.show_chart,
+              size: 48,
+              color: isDark ? Colors.grey[600] : Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Chart view available on mobile',
+              style: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPeriodButton(String period) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isSelected = _selectedPeriod == period;
-
+    
     return InkWell(
       onTap: () async {
         setState(() => _selectedPeriod = period);
@@ -802,9 +831,9 @@ class _InvestingScreenState extends State<InvestingScreen> {
         style: TextStyle(
           fontSize: 14,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected
-              ? Colors.blue
-              : (isDark ? Colors.grey[400] : Colors.grey[600]),
+          color: isSelected 
+            ? Colors.blue 
+            : (isDark ? Colors.grey[400] : Colors.grey[600]),
         ),
       ),
     );
@@ -964,23 +993,23 @@ class _InvestingScreenState extends State<InvestingScreen> {
                 ),
               );
             } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (ctx) => Scaffold(
-                    body: CryptoDetailScreen(
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (ctx) => Scaffold(
+                  body: CryptoDetailScreen(
                       coinId: item['coinId'] as String? ?? '',
                       symbolLabel: item['symbol'] as String,
                       displayName: item['name'] as String,
                       iconSymbol:
                           item['icon'] as String? ?? item['symbol'] as String,
                       iconColor: item['iconColor'] as Color? ?? Colors.blue,
-                    ),
-                    bottomNavigationBar: const _BottomNavPlaceholder(),
                   ),
-                  fullscreenDialog: false,
+                  bottomNavigationBar: const _BottomNavPlaceholder(),
                 ),
-              );
+                fullscreenDialog: false,
+              ),
+            );
             }
           },
           child: Row(
@@ -1021,10 +1050,10 @@ class _InvestingScreenState extends State<InvestingScreen> {
                               icon ??
                                   (item['symbol'] as String).substring(0, 1),
                               style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                             );
                           }
                         }(),
@@ -1213,7 +1242,7 @@ class _BottomNavPlaceholder extends StatelessWidget {
 // ignore: unused_element
 class _ChartPainter extends CustomPainter {
   final bool isDark;
-
+  
   _ChartPainter({required this.isDark});
 
   @override
@@ -1224,11 +1253,11 @@ class _ChartPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path();
-
+    
     // Create a flat line since portfolio is $0.00
     final centerY = size.height / 2;
     path.moveTo(0, centerY);
-
+    
     // Add slight variations for visual interest
     for (var i = 0; i <= 20; i++) {
       final x = (size.width / 20) * i;
@@ -1237,12 +1266,12 @@ class _ChartPainter extends CustomPainter {
     }
 
     canvas.drawPath(path, paint);
-
+    
     // Draw dots pattern
     final dotPaint = Paint()
       ..color = isDark ? Colors.grey[800]! : Colors.grey[200]!
       ..style = PaintingStyle.fill;
-
+      
     for (var x = 0.0; x < size.width; x += 20) {
       for (var y = 0.0; y < size.height; y += 20) {
         canvas.drawCircle(Offset(x, y), 1, dotPaint);
@@ -1257,7 +1286,7 @@ class _ChartPainter extends CustomPainter {
 // Mini chart painter for watchlist items
 class _MiniChartPainter extends CustomPainter {
   final bool isPositive;
-
+  
   _MiniChartPainter({required this.isPositive});
 
   @override
@@ -1268,7 +1297,7 @@ class _MiniChartPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path();
-
+    
     // Downward trending for Bitcoin
     path.moveTo(0, size.height * 0.2);
     path.lineTo(size.width * 0.2, size.height * 0.3);
