@@ -69,44 +69,80 @@
     // This must happen before Flutter loads to prevent nativeCommunication errors
     (function() {
       if (typeof window !== 'undefined') {
+        // Create nativeCommunication object first
+        const safeNativeCommunication = {};
+        
         // Initialize Flutter platform structure immediately
         if (!window._flutter) {
           window._flutter = {};
         }
         
-        // Create a safe platform object with Proxy to catch all property access
+        // Create platform object with nativeCommunication already set
         if (!window._flutter.platform) {
-          const safeNativeCommunication = {};
-          
-          // Use Proxy to intercept all property access and creation
-          window._flutter.platform = new Proxy({}, {
-            get: function(target, prop) {
-              if (prop === 'nativeCommunication') {
-                return safeNativeCommunication;
-              }
-              // For any other property, return an empty object or the property if it exists
-              return target[prop] || {};
-            },
-            set: function(target, prop, value) {
-              if (prop === 'nativeCommunication') {
-                // Silently accept the value
-                console.warn('Plugin attempted to set nativeCommunication (accepted on web)');
-                return true;
-              }
-              target[prop] = value;
-              return true;
-            },
-            has: function(target, prop) {
-              return prop === 'nativeCommunication' || prop in target;
-            }
-          });
-          
-          // Also set it directly as a fallback
-          window._flutter.platform.nativeCommunication = safeNativeCommunication;
-        } else if (!window._flutter.platform.nativeCommunication) {
-          // If platform exists but nativeCommunication doesn't, add it
-          window._flutter.platform.nativeCommunication = {};
+          window._flutter.platform = {
+            nativeCommunication: safeNativeCommunication
+          };
+        } else {
+          // Ensure nativeCommunication exists
+          if (!window._flutter.platform.nativeCommunication) {
+            window._flutter.platform.nativeCommunication = safeNativeCommunication;
+          }
         }
+        
+        // Use Proxy to intercept ALL property access on platform object
+        const originalPlatform = window._flutter.platform;
+        window._flutter.platform = new Proxy(originalPlatform, {
+          get: function(target, prop) {
+            // Always return nativeCommunication if requested
+            if (prop === 'nativeCommunication') {
+              return safeNativeCommunication;
+            }
+            // For other properties, return from target or create empty object
+            if (prop in target) {
+              return target[prop];
+            }
+            // Return empty object for any missing property
+            return {};
+          },
+          set: function(target, prop, value) {
+            // Always allow setting nativeCommunication
+            if (prop === 'nativeCommunication') {
+              // Merge with existing object if value is an object
+              if (typeof value === 'object' && value !== null) {
+                Object.assign(safeNativeCommunication, value);
+              } else {
+                target[prop] = safeNativeCommunication;
+              }
+              return true;
+            }
+            // Allow setting other properties
+            target[prop] = value;
+            return true;
+          },
+          has: function(target, prop) {
+            // Always return true for nativeCommunication
+            if (prop === 'nativeCommunication') {
+              return true;
+            }
+            return prop in target;
+          },
+          ownKeys: function(target) {
+            // Include nativeCommunication in keys
+            const keys = Object.keys(target);
+            if (!keys.includes('nativeCommunication')) {
+              keys.push('nativeCommunication');
+            }
+            return keys;
+          }
+        });
+        
+        // Also ensure it's directly accessible as a fallback
+        Object.defineProperty(window._flutter.platform, 'nativeCommunication', {
+          value: safeNativeCommunication,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
         
         console.log('Flutter platform structure initialized with Proxy protection');
       }
