@@ -65,6 +65,25 @@
     }
   </style>
   <script>
+    // CRITICAL: Initialize Flutter platform structure FIRST, before anything else
+    // This must happen before Flutter loads to prevent nativeCommunication errors
+    (function() {
+      if (typeof window !== 'undefined') {
+        // Initialize Flutter platform structure immediately
+        if (!window._flutter) {
+          window._flutter = {};
+        }
+        if (!window._flutter.platform) {
+          window._flutter.platform = {};
+        }
+        // Create nativeCommunication object that plugins can safely use
+        if (!window._flutter.platform.nativeCommunication) {
+          window._flutter.platform.nativeCommunication = {};
+        }
+        console.log('Flutter platform structure initialized');
+      }
+    })();
+    
     // Set up error handlers IMMEDIATELY, before any other scripts load
     (function() {
       // Suppress nativeCommunication errors from plugins on web
@@ -149,37 +168,14 @@
       }
     }, 3000); // Check after 3 seconds
     
-    // Patch window object to prevent nativeCommunication errors
-    // This must happen before Flutter loads - create the entire Flutter platform structure
-    (function() {
-      if (typeof window !== 'undefined') {
-        // Initialize Flutter platform structure if it doesn't exist
-        if (!window._flutter) {
-          window._flutter = {};
-        }
-        if (!window._flutter.platform) {
-          window._flutter.platform = {
-            // Create a safe nativeCommunication object that plugins can use
-            nativeCommunication: {}
-          };
-        } else if (!window._flutter.platform.nativeCommunication) {
-          // If platform exists but nativeCommunication doesn't, add it
-          window._flutter.platform.nativeCommunication = {};
-        }
-        
-        // Make sure the structure is properly initialized
-        // Some plugins might try to set properties directly
-        try {
-          if (!window._flutter.platform.nativeCommunication) {
-            window._flutter.platform.nativeCommunication = {};
-          }
-        } catch (e) {
-          console.warn('Error initializing nativeCommunication:', e);
-        }
-        
-        console.log('Flutter platform structure initialized for web');
+    // Ensure Flutter platform structure exists (redundant check, but safe)
+    if (typeof window !== 'undefined') {
+      if (!window._flutter) window._flutter = {};
+      if (!window._flutter.platform) window._flutter.platform = {};
+      if (!window._flutter.platform.nativeCommunication) {
+        window._flutter.platform.nativeCommunication = {};
       }
-    })();
+    }
     
     // Check if Flutter bootstrap script exists
     function checkFlutterBootstrap() {
