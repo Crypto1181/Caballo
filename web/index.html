@@ -150,33 +150,44 @@
     }, 3000); // Check after 3 seconds
     
     // Patch window object to prevent nativeCommunication errors
-    // This must happen before Flutter loads
+    // This must happen before Flutter loads - create the entire Flutter platform structure
     (function() {
       if (typeof window !== 'undefined') {
-        // Create a safe object for plugin initialization
+        // Initialize Flutter platform structure if it doesn't exist
         if (!window._flutter) {
           window._flutter = {};
         }
         if (!window._flutter.platform) {
-          window._flutter.platform = {};
+          window._flutter.platform = {
+            // Create a safe nativeCommunication object that plugins can use
+            nativeCommunication: {}
+          };
+        } else if (!window._flutter.platform.nativeCommunication) {
+          // If platform exists but nativeCommunication doesn't, add it
+          window._flutter.platform.nativeCommunication = {};
         }
-        // Provide a safe nativeCommunication object
-        Object.defineProperty(window._flutter.platform, 'nativeCommunication', {
-          get: function() {
-            return {};
-          },
-          set: function(value) {
-            // Silently accept any value
-            console.warn('Plugin attempted to set nativeCommunication (suppressed on web)');
-          },
-          configurable: true,
-          enumerable: true
-        });
+        
+        // Make sure the structure is properly initialized
+        // Some plugins might try to set properties directly
+        try {
+          if (!window._flutter.platform.nativeCommunication) {
+            window._flutter.platform.nativeCommunication = {};
+          }
+        } catch (e) {
+          console.warn('Error initializing nativeCommunication:', e);
+        }
+        
+        console.log('Flutter platform structure initialized for web');
       }
     })();
     
     // Check if Flutter bootstrap script exists
     function checkFlutterBootstrap() {
+      // Double-check that Flutter platform structure exists before loading
+      if (typeof window !== 'undefined' && window._flutter && !window._flutter.platform.nativeCommunication) {
+        window._flutter.platform.nativeCommunication = {};
+      }
+      
       const script = document.createElement('script');
       script.src = 'flutter_bootstrap.js';
       script.type = 'application/javascript';
@@ -189,6 +200,10 @@
       };
       script.onload = function() {
         console.log('Flutter bootstrap script loaded');
+        // One more check after script loads
+        if (typeof window !== 'undefined' && window._flutter && !window._flutter.platform.nativeCommunication) {
+          window._flutter.platform.nativeCommunication = {};
+        }
       };
       document.head.appendChild(script);
     }
