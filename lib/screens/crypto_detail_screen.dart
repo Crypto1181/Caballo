@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_inappwebview/flutter_inappwebview.dart' if (dart.library.html) 'package:flutter_inappwebview/flutter_inappwebview_stub.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' if (dart.library.html) '../utils/inappwebview_stub.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as ws_status;
 import '../providers/language_provider.dart';
