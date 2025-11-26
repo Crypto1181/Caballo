@@ -635,6 +635,7 @@ class _CryptoDetailScreenState extends State<CryptoDetailScreen> {
   }
 
   Future<void> _waitForInit() async {
+    if (kIsWeb) return; // Skip on web
     for (int i = 0; i < 40; i++) {
       try {
         final res = await _controller?.evaluateJavascript(
@@ -787,6 +788,12 @@ class _CryptoDetailScreenState extends State<CryptoDetailScreen> {
         )
         .toList();
 
+    if (kIsWeb) {
+      _chartInitialized = true;
+      if (mounted) setState(() => _loading = false);
+      return; // Skip chart initialization on web
+    }
+    
     final script =
         "initChart(${jsonEncode(data)}, ${jsonEncode(options)}, ${jsonEncode(volume)});";
     _controller?.evaluateJavascript(source: script);
@@ -864,6 +871,7 @@ class _CryptoDetailScreenState extends State<CryptoDetailScreen> {
           if (data == null) return;
           final close = double.parse(data['c'] ?? '0');
           final vol = double.tryParse(data['v'] ?? '0') ?? 0;
+          if (kIsWeb) return; // Skip on web
           final now = (DateTime.now().millisecondsSinceEpoch / 1000).round();
           _controller?.evaluateJavascript(
             source:
@@ -893,6 +901,7 @@ class _CryptoDetailScreenState extends State<CryptoDetailScreen> {
             'value': vol,
             'color': close >= open ? '#26a69a' : '#ef5350',
           };
+          if (kIsWeb) return; // Skip on web
           _controller?.evaluateJavascript(
             source: "updateBar(${jsonEncode(bar)}, ${jsonEncode(volBar)});",
           );

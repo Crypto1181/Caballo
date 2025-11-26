@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 
 // Stub controller class
 class InAppWebViewController {
-  Future<void> evaluateJavascript({required String source}) async {
-    // No-op on web
+  Future<dynamic> evaluateJavascript({required String source}) async {
+    // Return null on web since we can't evaluate JavaScript
+    return null;
   }
   
   Future<void> loadUrl({required String url}) async {

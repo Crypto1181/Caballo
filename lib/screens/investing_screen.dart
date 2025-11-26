@@ -841,7 +841,7 @@ class _InvestingScreenState extends State<InvestingScreen> {
   }
 
   Future<void> _initChart(bool isDark) async {
-    if (_chartReady) return;
+    if (_chartReady || kIsWeb) return; // Skip on web
     for (int i = 0; i < 40; i++) {
       try {
         final res = await _chartController?.evaluateJavascript(
@@ -858,7 +858,7 @@ class _InvestingScreenState extends State<InvestingScreen> {
   }
 
   Future<void> _updateChartPeriod(String period, {bool? isDark}) async {
-    if (!_chartReady) return;
+    if (!_chartReady || kIsWeb) return; // Skip on web
     final tfMap = {
       '1H': '1h',
       '1D': '1d',
